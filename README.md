@@ -173,6 +173,15 @@ details on methods can be found in the FLAG paper.
        alt="Nextflow" width="300"/>
 </p>
 
+## FLAG Preprint
+The preprint of FLAG can be found at: https://www.biorxiv.org/content/10.1101/2023.07.14.548907v1
+
+## FLAG Citation
+When using FLAG please cite:
+FLAG: Find, Label Annotate Genomes, a fully automated tool for genome gene structural and functional annotation of highly fragmented non-model species
+William Troy, Joana Damas, Alexander J Titus, Brandi L Cantarel
+bioRxiv 2023.07.14.548907; doi: https://doi.org/10.1101/2023.07.14.548907
+
 ## Citations
 
 <div id="refs" class="references csl-bib-body" line-spacing="2">

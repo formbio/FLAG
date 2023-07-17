@@ -1,0 +1,208 @@
+<h2>How to use Scipio (version 1.0)</h2>
+
+<h4>Requirements</h4>
+	<ul style="line-height: 20px">
+	<li> Bioperl (download from <a class="external" href="http://www.bioperl.org/wiki/Getting_BioPerl"  target="foobar"> bioperl.org </a>)                      
+        </li>
+	<li> YAML Perl module (download from <a class="external" href="http://search.cpan.org/~ingy/YAML-0.66/lib/YAML.pm" target="foobar"> CPAN</a>) </li>
+	<li> BLAT binary (see instructions at <a class="external" href="http://genome.ucsc.edu/FAQ/FAQblat#blat3"  target="foobar"> UCSC</a>)
+	</li>
+	<li> Genome of choice in fasta format (you can search <a class="external" href="http://www.diark.org"  target="foobar">diArk</a> for sequenced eukaryotic genomes)
+	</li></ul>
+
+<h4>What the Scipio script does</h4>
+
+<p>The intention of the script is to locate protein query sequences in DNA targets.</p>
+
+<p>BLAT does most of the computational work, however, there is some important postprocessing that is performed by 
+the script. This includes the following tasks:</p>
+
+<ul style="margin-top: 0px">
+<li>BLAT does not try to align codons that are split by introns. The script searches for missing codons, preferring those that are split at splice sites, and adds the nucleotides to the corresponding exons.</li>
+
+<li>For each query sequence, most BLAT hits are discarded and only
+(the) one best hit is displayed. In our case, we are only interested
+in nearly 100% sequence identity.</li>
+
+<li>We are prepared for the case of genes that have partial hits on
+multiple targets.  First, all BLAT hits are collected, and sorted by score. Then non-overlapping
+hits are taken to form a collection of hits of the same query. 
+(This is very useful if the target file is from an early stage of
+assembly, when gene locations are likely to exceed contig boundaries.)</li>
+
+<li>Frameshifts that usually cause BLAT to split an exon into multiple separate matches, are joined back into a single match (this can optionally be disabled).</li>
+
+<li>Retrieve all the corresponding sequences and group them together with the BLAT results to form the output described below.</li>
+</ul>
+<h4>Usage</h4>
+<table>
+<colgroup> 
+ <col width=10%>
+ <col width=30%>
+ <col width=60%>
+</colgroup> 
+<tr><td colspan=3 style="font-family: monospace"> scipio.pl 
+[<i>&#9001;options&#9002;</i>]
+<i> &#9001;target&#9002;</i> 
+<i> &#9001;query&#9002;</i></td></tr>
+<tr></tr>
+<tr> <td></td> 
+     <td><span style="font: italic 100% monospace">&#9001;target&#9002; </span> is a DNA file</td> </tr>
+<tr> <td></td> 
+     <td><span style="font: italic 100% monospace;">&#9001;query&#9002; </span> is a protein file</td> </tr>
+<tr> <td></td> <td>both in FASTA format</td> </tr>
+<tr></tr>
+<tr><td> Options: </td>
+    <td style="font-family: monospace"> --blat_output=<i>&#9001;filename&#9002;</i> </td> 
+    <td> name of BLAT output file (<span style="font-family: monospace">.psl</span>); if not specified, defaults to the newest <span style="font-family: monospace">psl</span> file in the working directory, or to <span style="font-family: monospace"> Scipio<i>&#9001;nnnn&#9002;</i>_blat.psl</span> if none exists </td> </tr>
+<tr> <td></td> <td style="font-family: monospace"> --force_new </td> 
+     <td> run BLAT even if output file already exists (the default is never to run BLAT if the specified or default <span style="font-family: monospace">psl</span> file would be overwritten)  </td> </tr>
+<tr> <td></td> <td style="font-family: monospace"> --verbose </td> 
+     <td>  show verbose information (including progress) </td> </tr>
+<tr> <td></td> <td style="font-family: monospace"> --min_score=<i>&#9001;value&#9002;</i></td>
+     <td> minimal score of the best partial hit for a query  </td> </tr>
+<tr> <td></td> <td style="font-family: monospace"> --min_identity=<i>&#9001;value&#9002;</i></td>
+     <td>    minimal identity in any hit (default is 0.9) </td> </tr>
+<tr> <td></td> <td style="font-family: monospace"> --max_mismatch=<i>&#9001;value&#9002;</i> </td>
+     <td>    maximal number of mismatches in any hit (0 means any number, the default)       </td> </tr>
+<tr> <td></td> <td style="font-family: monospace"> --split_on_fs   </td> 
+     <td> do not join matchings separated by frameshifts (the default is to consider them a single exon) </td> </tr>
+<tr> <td></td> <td style="font-family: monospace"> --region_size=<i>&#9001;value&#9002;</i>     </td> 
+     <td> size of shown upstream/downstream sequence parts (defaults to 1000, maximum is 75000) </td> </tr>
+<tr> <td></td> <td style="font-family: monospace"> --force_score=<i>&#9001;value&#9002;</i>   </td> 
+     <td> specify a score (between 0 and 1) that forces a hit to be shown even if it is contradicting a better one <br>
+            (these hits are not assembled together and shown as <span style="font-family: monospace"><i>&#9001;queryname&#9002;</i>_(1)</span>, etc.) </td> </tr>
+<tr> <td></td> <td style="font-family: monospace"> --partial_target</td> 
+     <td> accept BLAT output files containing hits referring to nonexistent target sequences </td> </tr>
+<tr> <td></td> <td style="font-family: monospace">  --show=<i>&#9001;list&#9002;</i> </td> 
+     <td rowspan=4> which keys are to be shown in YAML output (details see below) </td> </tr>
+<tr> <td></td> <td style="font-family: monospace">  --show_intron=<i>&#9001;list&#9002;</i> </td> </tr>
+<tr> <td></td> <td style="font-family: monospace">  --show_exon=<i>&#9001;list&#9002;</i>   </td> </tr>
+<tr> <td></td> <td style="font-family: monospace">  --show_gap=<i>&#9001;list&#9002; </i>   </td> </tr>
+<tr> <td></td> <td style="font-family: monospace">  --hide_undef    </td> <td> hide keys with undefined or empty list values </td> </tr>
+<tr> <td></td> <td style="font-family: monospace">  --hide_defaults </td> <td> hide some keys if they have a default value   </td></tr>
+<tr></tr>
+<tr> <td colspan=3>  Options passed to BLAT (ignored when BLAT is not run): </td></tr>
+<tr> <td></td> <td style="font-family: monospace">  --blat_bin=<i>&#9001;name&#9002;</i>  </td> <td> name of BLAT executable, defaults to "blat"</td> </tr>
+<tr> <td></td> <td style="font-family: monospace">  --blat_params=<i>&#9001;params&#9002;</i>  </td> <td> parameters passed to BLAT </td>             </tr>
+<tr> <td></td> <td style="font-family: monospace">  --blat_tilesize=<i>&#9001;..&#9002;</i>  </td>  <td rowspan=3> (see BLAT usage information)</td>  </tr>
+<tr> <td></td> <td style="font-family: monospace">  --blat_score=&#9001;..&#9002;    </td> </tr>
+<tr> <td></td> <td style="font-family: monospace">  --blat_identity=&#9001;..&#9002; </td> </tr>
+
+
+</table>
+<br>
+
+<h4>Output overview</h4>
+<p>The script produces an output in YAML format. Additional scripts are supplied that transform the YAML output into other formats (e.g. GFF3). The output is organized as follows:</p>
+
+<p>For each query, a list of the matched parts is given:</p>
+<div style="position:relative; left: 40px; font-family: monospace;">
+	<div><i>&#9001;query 1&#9002;</i>:</div>
+	<div style="position:relative; left: 20px">  - <i>&#9001;1st BLAT hit&#9002;</i></div>
+	<div style="position:relative; left: 20px">  - <i>&#9001;2nd BLAT hit&#9002;</i></div>
+	<div style="position:relative; left: 20px">     ...</div>
+	<p />
+	<div><i>&#9001;query 2&#9002;</i>:</div>
+	<div style="position:relative; left: 20px">  - <i>&#9001;1st BLAT hit&#9002;</i></div>
+</div>
+<p>etc.</p>
+
+<p>Usually, there is only one matched part (= BLAT hit) for each query, except in cases where queries are found on multiple non-overlapping targets (contigs).</p>
+<p>At the end of the output, a list of the unmatched sequences is shown.</p>
+<br>
+<h4>Description of keys</h4>
+<h5>Keys for BLAT hits</h5>
+Every BLAT hit is described by the following keys:
+
+<table><colgroup>
+<tr><td class="docu_left" style="padding-top:10px;font-family: monospace">ID</td><td class="docu_right" style="padding-top:10px">The id of the BLAT hit (equals the line number in the psl file).</td></tr>
+
+<tr><td class="docu_left" style="font-family: monospace">status</td><td class="docu_right">One of "complete", "partial", "incomplete" or "manual". "complete" means that Scipio had no problems locating the query, "partial" means that the hit is on one of multiple targets each matching a part of the query, "incomplete" means there might be the need to edit it manually. "manual" can be entered if the output was modified by hand.</td></tr>
+			 
+<tr><td class="docu_left" style="font-family: monospace">reason</td><td class="docu_right">If <span style="font-family: monospace">status</span> is "incomplete", the reason why.</td></tr>
+
+<tr><td class="docu_left" style="font-family: monospace">prot_len</td><td class="docu_right">The length of the query (in amino acid coordinates).</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">prot_start</td><td class="docu_right">Start of the matched part of the query if larger than zero.</td></tr>  
+<tr><td class="docu_left" style="font-family: monospace">prot_end</td><td class="docu_right">End of the matched part of the query if less than <span style="font-family: monospace">prot_len</span>.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">prot_seq</td><td class="docu_right">The query sequence (in a partial hit: only the matched part).</td></tr>
+
+<tr><td class="docu_left" style="font-family: monospace">target</td><td class="docu_right">The name of the target sequence.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">target_len</td><td class="docu_right">The total length of the target sequence.</td></tr>
+
+<tr><td class="docu_left" style="font-family: monospace">strand</td><td class="docu_right">"+" (= forward) or "-" (= reverse).</td></tr>
+
+<tr><td class="docu_left" style="font-family: monospace">dna_start</td><td class="docu_right" rowspan=2>The location of the hit.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">dna_end</td><td class="docu_right">      </td></tr>
+  		 
+<tr><td class="docu_left" style="font-family: monospace">matches</td><td class="docu_right">The number of matches if less than <span style="font-family: monospace">prot_len</span>.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">mismatches</td><td class="docu_right">The number of mismatches.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">undetermined</td><td class="docu_right">The number of undetermined residues.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">unmatched</td><td class="docu_right">The number of unmatched query residues.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">additional</td><td class="docu_right">The number of additional residues in the translated target.</td></tr>
+
+<tr><td class="docu_left" style="font-family: monospace">score</td><td class="docu_right">The score of the hit.</td></tr>
+
+<tr><td class="docu_left" style="font-family: monospace">upstream</td><td class="docu_right">DNA Sequence upstream of hit, ending before start codon.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">upstream_gap</td><td class="docu_right">(unaligned) DNA Sequence preceding a partial hit.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">matchings</td><td class="docu_right">The locations of exons and introns, see next section.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">stopcodon</td><td class="docu_right">Stop codon if present.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">downstream</td><td class="docu_right">DNA Sequence downstream of hit, starting with stop codon if present.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">downstream_gap </td><td class="docu_right">(unaligned) DNA Sequence following a partial hit.</td></tr>
+</table>
+<p>The commandline parameter <span style="font-family: monospace">--show=<i>&#9001;comma-separated list&#9002;</i></span> can be used to choose a user-defined
+collection of keys to be shown. By default, all of the above are shown.</p>
+<br>
+<h5> Keys for matchings </h5>
+Every matching (intron/exon) is given with the following keys:
+<table>
+<tr><td class="docu_left" style="padding-top:10px;font-family: monospace">type</td><td class="docu_right" style="padding-top:10px">"intron","exon" or "gap".</td></tr>
+
+<tr><td class="docu_left" style="font-family: monospace">nucl_start</td><td class="docu_right" rowspan=2>Location in the query (in nucleotide coordinates; 
+<span style="font-family: monospace">nucl_end</span> not for introns).</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">[nucl_end]</td></tr>
+
+<tr><td class="docu_left" style="font-family: monospace">dna_start</td><td class="docu_right" rowspan=2>Location in the target.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">dna_end</td></tr>
+
+<tr><td class="docu_left" style="font-family: monospace">seq</td><td class="docu_right">DNA sequence of the feature.</td></tr>
+</table><br>
+Keys that appear only in exons:
+<table><colgroup><col width=20%><col width=80%></colgroup>
+<tr><td class="docu_left" style="padding-top:10px;font-family: monospace">seqshifts</td><td class="docu_right" style="padding-top:10px">Location of sequence shifts.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">mismatchlist</td><td class="docu_right">Positions of mismatches (in query coordinates).</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">undeterminedlist</td><td class="docu_right">Positions of undetermined residues (in query coordinates).</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">inframe_stopcodons</td><td class="docu_right">Positions of in-frame stopcodons (in query coordinates).</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">translation</td><td class="docu_right">Translation of the aligned part of the DNA sequence.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">overlap</td><td class="docu_right">Number of nucleotides at the end of the target that are identical with the beginning of the following target, and not considered part of this location.</td></tr>
+</table>
+<p>The commandline parameters <span style="font-family: monospace">--show_exon=&#9001;...&#9002;, --show_intron=&#9001;...&#9002;, --show_gap=&#9001;...&#9002;</span> can be used to choose user-defined output for matchings.
+The following additional keys can be activated by this: 
+<table><colgroup><col width=20%><col></colgroup>
+<tr><td class="docu_left" style="padding-top:10px;font-family: monospace">nucl_pos</td>
+    <td class="docu_right" style="padding-top:10px">In introns, a synonym for <span style="font-family: monospace">nucl_start</span>(=<span style="font-family: monospace">nucl_end</span>)
+<tr><td class="docu_left" style="font-family: monospace">prot_start</td><td class="docu_right" rowspan=2>
+The location transformed into residue coordinates rather than nucleotides. A remainder of 1 is rounded down, and 2 is rounded up.</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">prot_end</td></tr>
+<tr><td class="docu_left" style="font-family: monospace">prot_pos</td><td class="docu_right">(this one for introns)</td></tr>
+
+<tr><td class="docu_left" style="font-family: monospace">prot_seq</td><td class="docu_right">Part of the query matching an exon, or unmatched part in a gap.</td></tr>
+</table>
+<br>
+<h4>Sequence coordinate conventions</h4>
+<p>All nucleotide and residue coordinates specify the number of preceding letters, that
+is, unlike in GFF, a location specified as starting at 5 and ending at 9 has length four,
+starting with the sixth and ending with the ninth character. (GFF would show this as
+<span style="font-family: monospace">start=6 end=9</span>).<br />
+Locations on reverse strand are specified by negative numbers that represent the distance
+from the end of the reverse strand. Hence, a location specified as starting at -9 and
+ending at -5, refers to the reverse complement of the previous example (GFF would show
+this also as <span style="font-family: monospace">start=6 end=9</span>).<br />
+Amino acid coordinates are rounded the following way:
+If a location contains a split codon, our convention is to count it
+if its second nucleotide belongs to the location. Consequently, in reading frame 2
+(meaning the last two nucleotides of the split codon are part of the next location) the start
+location is rounded down and the codon is considered part of the next location; conversely,
+a reading frame of 1 means that the codon is considered part of the previous
+location, and the starting point for the next location is rounded up when given in amino acid / codon coordinates.
+</p>

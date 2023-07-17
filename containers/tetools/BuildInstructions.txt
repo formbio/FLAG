@@ -1,0 +1,6 @@
+The docker file for tetools is based off of the public dfam Dockerfile located here: https://github.com/Dfam-consortium/TETools/tree/master
+
+Before building a the tetools docker image from the tetools folder follow the instructions below to download the repeat masker and repeat modeler files into the src folder:
+cd src
+wget https://www.repeatmasker.org/RepeatMasker/RepeatMasker-4.1.2-p1.tar.gz
+wget http://www.repeatmasker.org/rmblast-2.11.0+-x64-linux.tar.gz

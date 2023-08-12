@@ -128,6 +128,38 @@ StructuralAnnotation/short_summary.specific.*.buscooutLenient.txt BUSCO scores o
 
 finalAnnots/*.gtf FINAL ANNOTATION with functional annotations added. This is the end output file.
 
+## Databases
+### Instructions on how to build the Entap database
+Your Entap database must contain 5 files in order to be in alignment with our Entap Configuration file used in FLAG:
+eggnog.db             entap_database.bin  uniprot_sprot.dmnd
+eggnog_proteins.dmnd  entap_database.db
+
+The Entap official instructions for building this can be found here: https://entap.readthedocs.io/en/v0.9.1-beta/basic_usage.html#usage-preparing-your-reference-databases
+
+For ease of use we simplify this process and confirm it is working as of August 11, 2023:
+1. Enter the flag_entap docker container:
+   docker run -it flag_entap:latest
+2. Download the required files that will be configured:
+   wget http://eggnog5.embl.de/download/eggnog_4.1/eggnog-mapper-data/eggnog4.clustered_proteins.fa.gz
+   wget http://eggnog6.embl.de/download/emapperdb-5.0.2/eggnog.db.gz
+   wget https://treegenesdb.org/FTP/EnTAP/latest/databases/entap_database.bin.gz
+   wget https://treegenesdb.org/FTP/EnTAP/latest/databases/entap_database.db.gz
+   mv FLAG/databases/uniprot_sprot.dmnd.gz .
+3. Unzip all databases
+   gunzip *
+4. Format the eggnog_proteins database:
+   EnTAP --config -d eggnog4.clustered_proteins.fa --out-dir makedbs -t 30 --ini /opt/EnTAP/entap_config.ini
+   mv makedbs/bin/eggnog4.dmnd eggnog_proteins.dmnd
+5. Deposit all Entap DBs into a folder and tar it
+   mkdir entapDBs
+   mv uniprot_sprot.dmnd entapDBs/
+   mv eggnog_proteins.dmnd entapDBs/
+   mv eggnog.db entapDBs/
+   mv entap_database.bin entapDBs/
+   mv entap_database.db entapDBs/
+   tar czf entapDBs.tar.gz entapDBs/
+6. Transfer your entapDBs.tar.gz out of the container to somewhere you can use it in your run. The total file size should be around 6.5 Gb
+
 ## Workflow Diagram
 
 The default workflow diagram of FLAG. As the input genome goes into all

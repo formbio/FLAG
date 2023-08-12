@@ -1,6 +1,41 @@
 # FLAG (Find Label Annotate Genes)
 This is the public repository for FLAG, the Form Bio Genome Annotation Workflow.
 
+## Table of Contents
+- [Run options:](#run-options)
+- [Necessary installs:](#necessary-installs)
+- [Summary](#summary)
+- [Run Parameteres:](#run-parameteres)
+- [Example Run commands](#example-run-commands)
+- [Extra Info on Parameters:](#extra-info-on-parameters)
+  * [genome](#genome)
+  * [masker](#masker)
+  * [protein](#protein)
+  * [rna](#rna)
+  * [fafile](#fafile)
+  * [gtffile](#gtffile)
+  * [proteinalgo](#proteinalgo)
+  * [lineage](#lineage)
+  * [annotationalgo](#annotationalgo)
+- [Extra Info on Programs:](#extra-info-on-programs)
+  * [Liftoff](#liftoff)
+  * [Augustus](#augustus)
+  * [Transdecoder](#transdecoder)
+- [Extra Info on Output Files:](#extra-info-on-output-files)
+- [Databases](#databases)
+  * [Instructions on how to build the Entap database](#instructions-on-how-to-build-the-entap-database)
+- [Workflow Diagram](#workflow-diagram)
+  * [1. Protein Workflow](#1-protein-workflow)
+  * [2. RNA Workflow](#2-rna-workflow)
+  * [3. Gene Prediction Workflow](#3-gene-prediction-workflow)
+  * [4. Overall](#4-overall)
+- [Methods](#methods)
+- [Tips and Tricks](#tips-and-tricks)
+- [Built With](#built-with)
+- [FLAG Preprint](#flag-preprint)
+- [FLAG Citation](#flag-citation)
+- [Citations](#citations)
+  
 ## Run options:
 The official release of FLAG supports running in either GCP (Google Cloud Platform) or locally, default is local. If running on GCP switch out the modules/nf-modules/nfconf/base.config with modules/nf-modules/nfconf/gcp.config.
 

@@ -51,3 +51,5 @@ touch tRNAScan.gff3
 for (( i=1; i<=$numQueries; i++ )); do
     cat ${i}.gff3 >> tRNAScan_${prefixAssembly}.gff3
 done
+
+cp tRNAScan_${prefixAssembly}.gff3 tRNAScan.gff3

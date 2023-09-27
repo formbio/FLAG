@@ -62,18 +62,16 @@ RUN cd /opt; git clone https://github.com/EVidenceModeler/EVidenceModeler.git
 
 #install conda
 RUN wget \
-    https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh \
-    && mkdir /root/.conda \
-    && bash Miniconda2-latest-Linux-x86_64.sh -b \
-    && rm -f Miniconda2-latest-Linux-x86_64.sh 
-
-ENV PATH="/root/miniconda2/bin:${PATH}"
-ARG PATH="/root/miniconda2/bin:${PATH}"
-
-Run conda create -n BUSCO -c conda-forge -c bioconda busco=5.3.2
-
+    https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda \
+    && rm -f Miniconda3-latest-Linux-x86_64.sh \
+    && chmod -R o+rX /opt/conda
+# change conda for singularity
+ENV PATH="/opt/conda/bin:${PATH}"
 RUN conda init
-
+RUN conda update -n base -c defaults conda
+ADD env.yml /opt/env.yml
+RUN conda env create -f /opt/env.yml
 
 #install agat
 RUN cpanm install Clone 

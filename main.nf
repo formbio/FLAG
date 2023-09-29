@@ -319,5 +319,5 @@ workflow {
   
  CombineAndFilter(maskedGenome,filesToFilter,params.lineage,params.size)
  entap(maskedGenome.combine(CombineAndFilter.out.gtfLenient).combine(entapDB))
- combinestructwfunct(entap.out.combine(CombineAndFilter.out.gtfLenient).combine(Channel.from(params.speciesScientificName)))
+ combinestructwfunct(entap.out.combine(CombineAndFilter.out.gtfLenient).combine(Channel.from(params.speciesScientificName)).combine(Channel.from(params.lineage)).combine(maskedGenome))
 }

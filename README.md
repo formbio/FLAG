@@ -4,6 +4,7 @@ This is the public repository for FLAG, the Form Bio Genome Annotation Workflow.
 ## Table of Contents
 - [Run options:](#run-options)
 - [Necessary installs:](#necessary-installs)
+- [Setup:](#setup)
 - [Summary](#summary)
 - [Run Parameteres:](#run-parameteres)
 - [Example Run commands](#example-run-commands)
@@ -44,7 +45,11 @@ This nextflow workflow can also be run on the Form Bio Platform which has it alr
 ## Necessary installs:
 1. Docker
 2. Nextflow
-
+   
+## Setup:
+1. All docker images are currently available in the github repo, they can also be built if desired. Pull them from the github repo: bash pull_docker_images.sh 
+2. If running singularity convert docker images to singularity images and move them to their respective locations (note currently the singularity images must be replaces after every run due to how the singularity temp folders are handled so run this script before each singularity run): bash convert_docker_to_singularity_and_move_to_folders.sh
+   
 ## Summary
 
 Genome annotation uses computational algorithms to predict the locations

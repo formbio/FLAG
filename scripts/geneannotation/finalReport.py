@@ -177,132 +177,258 @@ for section_name, data in results3_number.items():
 #        print(f"{key}: {value}")
 
 
+if number_of_isoform_trna:
+    html_template = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>FLAG Annotation Report</title>
+        <style>
+            h1 {{
+                font-family: Arial, sans-serif;
+                font-size: 36px;
+                text-align: center;
+                padding: 20px;
+                background-color: #3498db; /* Background color */
+                color: #fff; /* Text color */
+                border-radius: 10px; /* Rounded corners */
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow */
+            }}
+           .percentage-bar-container {{
+               width: 550px;
+               display: flex; /* or display: inline-block; */
+           }}
 
-html_template = """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>FLAG Annotation Report</title>
-    <style>
-        h1 {{
-            font-family: Arial, sans-serif;
-            font-size: 36px;
-            text-align: center;
-            padding: 20px;
-            background-color: #3498db; /* Background color */
-            color: #fff; /* Text color */
-            border-radius: 10px; /* Rounded corners */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow */
-        }}
-       .percentage-bar-container {{
-           width: 550px;
-           display: flex; /* or display: inline-block; */
-       }}
+           .percentage-bar {{
+               height: 20px;
+               background-color: lightgray;
+               margin-right: 0px; /* Add some spacing between bars */
+           }}
+           
+          .percentage-number {{
+               position: absolute;
+               top: 0;
+               left: 50%;
+               transform: translateX(-50%);
+           }}
+           .complete-single-copy {{
+               background-color: blue;
+           }}
 
-       .percentage-bar {{
-           height: 20px;
-           background-color: lightgray;
-           margin-right: 0px; /* Add some spacing between bars */
-       }}
-       
-      .percentage-number {{
-           position: absolute;
-           top: 0;
-           left: 50%;
-           transform: translateX(-50%);
-       }}
-       .complete-single-copy {{
-           background-color: blue;
-       }}
+           .complete-duplicated {{
+               background-color: #00008B;
+           }}
 
-       .complete-duplicated {{
-           background-color: #00008B;
-       }}
+           .fragmented {{
+               background-color: yellow;
+           }}
 
-       .fragmented {{
-           background-color: yellow;
-       }}
+           .missing {{
+               background-color: red;
+           }}
+            .inline-div {{
+                display: flex;
+                justify-content: center;
+               align-items: center;
+               width: 550px;
+               height: 25px;
+            }}
+            .label-box {{
+               width: 20px;
+               height: 20px;
+               margin-right: 5px;
+               margin-left: 5px;
+               display: inline-block;
+           }}
 
-       .missing {{
-           background-color: red;
-       }}
-        .inline-div {{
-            display: flex;
-            justify-content: center;
-           align-items: center;
-           width: 550px;
-           height: 25px;
-        }}
-        .label-box {{
-           width: 20px;
-           height: 20px;
-           margin-right: 5px;
-           margin-left: 5px;
-           display: inline-block;
-       }}
+           .complete-single-copy-label {{
+               background-color: blue;
+           }}
 
-       .complete-single-copy-label {{
-           background-color: blue;
-       }}
+           .complete-duplicated-label {{
+               background-color: #00008B;
+           }}
 
-       .complete-duplicated-label {{
-           background-color: #00008B;
-       }}
+           .fragmented-label {{
+               background-color: yellow;
+           }}
 
-       .fragmented-label {{
-           background-color: yellow;
-       }}
-
-       .missing-label {{
-           background-color: red;
-       }}
-   </style>
-</head>
-<body>
-   <h1>FLAG: Find, Label, Annotate, Genes Annotation Report</h1>
-   <h2>Annotation of {7}</h2>
-   <p>Completed on {8}</p>
-   <h2>Busco Results</h2>
-   <p>Busco Version: 5.3.2</p>
-   <div class="inline-div">
-    <div class="label-box complete-single-copy-label"></div>Complete (C) and single-copy (S)
-   <div class="label-box complete-duplicated-label"></div>Complete (C) and duplicatex (D)
-   </div>
-   <div class="inline-div">
-    <div class="label-box fragmented-label"></div>Fragmented (F)
-   <div class="label-box missing-label"></div>Missing (M)
-   </div>
-   <div class="percentage-bar-container">
-       <div class="percentage-bar complete-single-copy" style="width: {1};">
+           .missing-label {{
+               background-color: red;
+           }}
+       </style>
+    </head>
+    <body>
+       <h1>FLAG: Find, Label, Annotate, Genes Annotation Report</h1>
+       <h2>Annotation of {7}</h2>
+       <p>Completed on {8}</p>
+       <h2>Busco Results</h2>
+       <p>Busco Version: 5.3.2</p>
+       <div class="inline-div">
+        <div class="label-box complete-single-copy-label"></div>Complete (C) and single-copy (S)
+       <div class="label-box complete-duplicated-label"></div>Complete (C) and duplicatex (D)
        </div>
-       <div class="percentage-bar complete-duplicated" style="width: {2};">
+       <div class="inline-div">
+        <div class="label-box fragmented-label"></div>Fragmented (F)
+       <div class="label-box missing-label"></div>Missing (M)
        </div>
-       <div class="percentage-bar fragmented" style="width: {3};">
+       <div class="percentage-bar-container">
+           <div class="percentage-bar complete-single-copy" style="width: {1};">
+           </div>
+           <div class="percentage-bar complete-duplicated" style="width: {2};">
+           </div>
+           <div class="percentage-bar fragmented" style="width: {3};">
+           </div>
+           <div class="percentage-bar missing" style="width: {4};">
+           </div>
        </div>
-       <div class="percentage-bar missing" style="width: {4};">
-       </div>
-   </div>
-      <p>Busco Assessment: {0}</p>
+          <p>Busco Assessment: {0}</p>
 
-   <p>Total BUSCO Groups: {5} for the {6} lineage</p>
+       <p>Total BUSCO Groups: {5} for the {6} lineage</p>
 
-    <h2>AGAT Statistics</h2>
-    <p>Number of Protein-coding Genes: {9}</p>
-    <p>Number of mRNAs: {10}</p>
-    <p>Number of Single-exon Protein-coding Genes: {11}</p>
-    <p>Number of Single-exon mRNA: {12}</p>
-    <p>Mean Number of mRNAs per Gene: {13}</p>
-    <p>Mean Number of Exons per mRNA: {14}</p>
-    <p>Mean Protein-coding Gene Length: {15}</p>
-    <p>Number of tRNAs: {16}</p>
-    <!-- Add more placeholders for other stats data -->
-</body>
-</html>
-""".format(
-    busco_version, complete_single_copy_percentage_style,
-    complete_duplicated_percentage_style, fragmented_percentage_style,
-    missing_percentage_style, total_busco_groups, lineage, scientific_name, formatted_datetime, number_of_isoform_genes, number_of_isoform_mrna, number_of_single_exon_isoform_mrna, number_of_single_exon_isoform_mrna, mean_mrnas_per_gene, mean_exons_per_mrna, mean_gene_length, number_of_isoform_trna
-)
+        <h2>AGAT Statistics</h2>
+        <p>Number of Protein-coding Genes: {9}</p>
+        <p>Number of mRNAs: {10}</p>
+        <p>Number of Single-exon Protein-coding Genes: {11}</p>
+        <p>Number of Single-exon mRNA: {12}</p>
+        <p>Mean Number of mRNAs per Gene: {13}</p>
+        <p>Mean Number of Exons per mRNA: {14}</p>
+        <p>Mean Protein-coding Gene Length: {15}</p>
+        <p>Number of tRNAs: {16}</p>
+        <!-- Add more placeholders for other stats data -->
+    </body>
+    </html>
+    """.format(
+        busco_version, complete_single_copy_percentage_style,
+        complete_duplicated_percentage_style, fragmented_percentage_style,
+        missing_percentage_style, total_busco_groups, lineage, scientific_name, formatted_datetime, number_of_isoform_genes, number_of_isoform_mrna, number_of_single_exon_isoform_mrna, number_of_single_exon_isoform_mrna, mean_mrnas_per_gene, mean_exons_per_mrna, mean_gene_length, number_of_isoform_trna
+    )
+else:
+    html_template = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>FLAG Annotation Report</title>
+        <style>
+            h1 {{
+                font-family: Arial, sans-serif;
+                font-size: 36px;
+                text-align: center;
+                padding: 20px;
+                background-color: #3498db; /* Background color */
+                color: #fff; /* Text color */
+                border-radius: 10px; /* Rounded corners */
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow */
+            }}
+           .percentage-bar-container {{
+               width: 550px;
+               display: flex; /* or display: inline-block; */
+           }}
+
+           .percentage-bar {{
+               height: 20px;
+               background-color: lightgray;
+               margin-right: 0px; /* Add some spacing between bars */
+           }}
+           
+          .percentage-number {{
+               position: absolute;
+               top: 0;
+               left: 50%;
+               transform: translateX(-50%);
+           }}
+           .complete-single-copy {{
+               background-color: blue;
+           }}
+
+           .complete-duplicated {{
+               background-color: #00008B;
+           }}
+
+           .fragmented {{
+               background-color: yellow;
+           }}
+
+           .missing {{
+               background-color: red;
+           }}
+            .inline-div {{
+                display: flex;
+                justify-content: center;
+               align-items: center;
+               width: 550px;
+               height: 25px;
+            }}
+            .label-box {{
+               width: 20px;
+               height: 20px;
+               margin-right: 5px;
+               margin-left: 5px;
+               display: inline-block;
+           }}
+
+           .complete-single-copy-label {{
+               background-color: blue;
+           }}
+
+           .complete-duplicated-label {{
+               background-color: #00008B;
+           }}
+
+           .fragmented-label {{
+               background-color: yellow;
+           }}
+
+           .missing-label {{
+               background-color: red;
+           }}
+       </style>
+    </head>
+    <body>
+       <h1>FLAG: Find, Label, Annotate, Genes Annotation Report</h1>
+       <h2>Annotation of {7}</h2>
+       <p>Completed on {8}</p>
+       <h2>Busco Results</h2>
+       <p>Busco Version: 5.3.2</p>
+       <div class="inline-div">
+        <div class="label-box complete-single-copy-label"></div>Complete (C) and single-copy (S)
+       <div class="label-box complete-duplicated-label"></div>Complete (C) and duplicatex (D)
+       </div>
+       <div class="inline-div">
+        <div class="label-box fragmented-label"></div>Fragmented (F)
+       <div class="label-box missing-label"></div>Missing (M)
+       </div>
+       <div class="percentage-bar-container">
+           <div class="percentage-bar complete-single-copy" style="width: {1};">
+           </div>
+           <div class="percentage-bar complete-duplicated" style="width: {2};">
+           </div>
+           <div class="percentage-bar fragmented" style="width: {3};">
+           </div>
+           <div class="percentage-bar missing" style="width: {4};">
+           </div>
+       </div>
+          <p>Busco Assessment: {0}</p>
+
+       <p>Total BUSCO Groups: {5} for the {6} lineage</p>
+
+        <h2>AGAT Statistics</h2>
+        <p>Number of Protein-coding Genes: {9}</p>
+        <p>Number of mRNAs: {10}</p>
+        <p>Number of Single-exon Protein-coding Genes: {11}</p>
+        <p>Number of Single-exon mRNA: {12}</p>
+        <p>Mean Number of mRNAs per Gene: {13}</p>
+        <p>Mean Number of Exons per mRNA: {14}</p>
+        <p>Mean Protein-coding Gene Length: {15}</p>
+        <!-- Add more placeholders for other stats data -->
+    </body>
+    </html>
+    """.format(
+        busco_version, complete_single_copy_percentage_style,
+        complete_duplicated_percentage_style, fragmented_percentage_style,
+        missing_percentage_style, total_busco_groups, lineage, scientific_name, formatted_datetime, number_of_isoform_genes, number_of_isoform_mrna, number_of_single_exon_isoform_mrna, number_of_single_exon_isoform_mrna, mean_mrnas_per_gene, mean_exons_per_mrna, mean_gene_length
+    )
 
 with open('results.html', 'w') as output_file:
     output_file.write(html_template)
+

@@ -177,7 +177,7 @@ for section_name, data in results3_number.items():
 #        print(f"{key}: {value}")
 
 
-if number_of_isoform_trna:
+if 'number_of_isoform_trna' in globals():
     html_template = """
     <!DOCTYPE html>
     <html>

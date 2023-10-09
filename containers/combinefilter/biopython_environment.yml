@@ -1,0 +1,38 @@
+name: biopython
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - _openmp_mutex=5.1=1_gnu
+  - biopython=1.79=py39h3811e60_1
+  - ca-certificates=2023.7.22=hbcca054_0
+  - ld_impl_linux-64=2.38=h1181459_1
+  - libblas=3.9.0=15_linux64_openblas
+  - libcblas=3.9.0=15_linux64_openblas
+  - libffi=3.4.4=h6a678d5_0
+  - libgcc-ng=11.2.0=h1234567_1
+  - libgfortran-ng=13.2.0=h69a702a_0
+  - libgfortran5=13.2.0=ha4646dd_0
+  - libgomp=11.2.0=h1234567_1
+  - liblapack=3.9.0=15_linux64_openblas
+  - libopenblas=0.3.20=pthreads_h78a6416_0
+  - libstdcxx-ng=11.2.0=h1234567_1
+  - ncurses=6.4=h6a678d5_0
+  - numpy=1.22.3=py39hc58783e_2
+  - openssl=3.0.11=h7f8727e_2
+  - pip=23.2.1=py39h06a4308_0
+  - python=3.9.18=h955ad1f_0
+  - python_abi=3.9=2_cp39
+  - readline=8.2=h5eee18b_0
+  - setuptools=68.0.0=py39h06a4308_0
+  - sqlite=3.41.2=h5eee18b_0
+  - tk=8.6.12=h1ccaba5_0
+  - tzdata=2023c=h04d1e81_0
+  - wheel=0.41.2=py39h06a4308_0
+  - xz=5.4.2=h5eee18b_0
+  - zlib=1.2.13=h5eee18b_0
+  - pip:
+    - bcbio-gff==0.7.0
+    - six==1.16.0
+prefix: /root/miniconda2/envs/biopython

@@ -92,6 +92,9 @@ RUN cd /opt; wget https://gitlab.com/PlantGenomicsLab/gFACs/-/archive/master/gFA
 ENV PATH "$PATH:/opt/gFACs-master/:/opt/gFACs-master/format_scripts/:/opt/gFACs-master/support_scripts/:/opt/gFACs-master/task_scripts/"
 
 RUN apt-get update; apt-get -y install samtools genometools 
+# install stuff for bioconda genbank conversion
+ADD biopython_environment.yml /opt/biopython_environment.yml
+RUN conda env create -f /opt/biopython_environment.yml
 
 # Install Scripts
 ENV repodir /seqprg

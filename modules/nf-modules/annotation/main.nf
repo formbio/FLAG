@@ -385,6 +385,7 @@ process miniprot {
 process combinestructwfunct {
   label 'evm'
   publishDir "$params.output/finalAnnots", mode: 'copy'
+  publishDir "${params.output}", pattern: '*html', mode: 'copy'
   errorStrategy  { task.attempt <= maxRetries  ? 'retry' : 'ignore' }
   input:
     tuple path(entap),path(annotation),val(species),val(lineage),path(genome)
@@ -395,6 +396,8 @@ process combinestructwfunct {
     path("cdna_*.fa")
     path("proteins_*.fa")
     path("short_summary.*.buscoout.txt")
+    path("results.html")
+    path("*.gb") optional true
   script:
   """
   bash ${params.repoDir}/scripts/geneannotation/parseEntap.sh -i ${entap} -a ${annotation} -s ${species} -l ${lineage} -g ${genome}

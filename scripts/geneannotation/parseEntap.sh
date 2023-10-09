@@ -78,26 +78,10 @@ for (( i=1; i<=$count; i++ )); do
     rm updatedAnnot_${i}.gtf
 done
 
-echo "adding comments to annotation"
-currentTime=`date`
-sed -i "1 i\#!Species: ${speciesName}" finalAnnotation.gtf
-sed -i "1 i\#!Form Bio annotation workflow version 2.0" finalAnnotation.gtf
-sed -i "1 i\#!Created with the Form Bio annotation workflow on: ${currentTime}" finalAnnotation.gtf
-sed -i "1 i\##gtf-version 3" finalAnnotation.gtf
-
-mv finalAnnotation.gtf final${speciesName}.gtf
-
-# make the protein fasta file
-agat_sp_extract_sequences.pl --clean_final_stop --gff final${speciesName}.gtf -f genome.fasta -p -o proteins_${speciesName}.fa
-
-# make the cdna fasta file
-agat_sp_extract_sequences.pl --clean_final_stop --gff final${speciesName}.gtf -f genome.fasta --cdna -o cdna_${speciesName}.fa
-
-# convert gtf to gff to supply both in the final output
-agat_convert_sp_gxf2gxf.pl -g final${speciesName}.gtf -o final${speciesName}.gff3
+agat_convert_sp_gxf2gxf.pl -g finalAnnotation.gtf -o finalAnnotation.gff3
 
 # Input file
-input_file="final${speciesName}.gff3"
+input_file="finalAnnotation.gff3"
 
 # Temporary file for storing modified content
 temp_file="temp_file.txt"
@@ -115,7 +99,47 @@ while IFS= read -r line; do
     echo "$line" >> "$temp_file"
 done < "$input_file"
 
-mv "$temp_file" "final${speciesName}.gff3"
+# Loop through each line in the input file
+while IFS= read -r line; do
+    if [[ $line == *"AGAT    gene"* ]]; then
+        # Replace "FLAG transcript" with "FLAG mrna"
+        line=$(echo "$line" | sed 's/AGAT\tgene/tRNAScan-SE\tgene/g')
+    elif [[ $line == *"AGAT    RNA"* ]]; then
+        # Replace "FLAG transcript" with "FLAG mrna"
+        line=$(echo "$line" | sed 's/AGAT\tRNA/tRNAScan-SE\ttRNA/g')
+    fi
+    # Append the modified line to the temporary file
+    echo "$line" >> "$temp_file"
+done < "$input_file"
+
+#mv "$temp_file" "final${speciesName}.gff3"
+
+sed -i 's/AGAT/FormBio/g' finalAnnotation.gff3
+sed -i 's/pseudogene/gene/g' finalAnnotation.gff3
+sed -i 's/agat/formbio/g' finalAnnotation.gff3
+sed -i 's/FormBio\tRNA/Formbio\ttRNA/g' finalAnnotation.gff3
+
+rm finalAnnotation.gtf
+agat_convert_sp_gff2gtf.pl --gff finalAnnotation.gff3 -o finalAnnotation.gtf
+
+echo "adding comments to annotation"
+currentTime=`date`
+sed -i "1 i\#!Species: ${speciesName}" finalAnnotation.gtf
+sed -i "1 i\#!Form Bio annotation workflow version 2.0" finalAnnotation.gtf
+sed -i "1 i\#!Created with the Form Bio annotation workflow on: ${currentTime}" finalAnnotation.gtf
+sed -i "1 i\##gtf-version 3" finalAnnotation.gtf
+
+mv finalAnnotation.gtf final${speciesName}.gtf
+mv finalAnnotation.gff3 final${speciesName}.gff3
+
+# make the protein fasta file
+agat_sp_extract_sequences.pl --clean_final_stop --gff final${speciesName}.gff3 -f ${genome} -p -o proteins_${speciesName}.fa
+
+# make the cdna fasta file
+agat_sp_extract_sequences.pl --clean_final_stop --gff final${speciesName}.gff3 -f ${genome} --cdna -o cdna_${speciesName}.fa
+
+# convert gtf to gff to supply both in the final output
+#agat_convert_sp_gxf2gxf.pl -g final${speciesName}.gtf -o final${speciesName}.gff3
 
 # Get agat stats
 agat_sp_statistics.pl --gff final${speciesName}.gff3 --output final${speciesName}.AGAT.stats
@@ -126,6 +150,10 @@ busco -i proteins_${speciesName}.fa -l ${lineage} -o buscoout -m protein -c ${th
 conda deactivate
 
 mv buscoout/short_summary.*.buscoout.txt .
+cp short_summary.*.buscoout.txt busco.txt
 
+python3 /seqprg/scripts/geneannotation/finalReport.py --input_stats "final${speciesName}.AGAT.stats" --lineage "${lineage}" --scientific_name "${speciesName}"
 
-
+conda activate biopython
+python /seqprg/scripts/formatting/gff_to_genbank.py "final${speciesName}.gff3" "${genome}"
+conda deactivate

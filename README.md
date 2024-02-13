@@ -209,10 +209,10 @@ For ease of use we simplify this process and confirm it is working as of August 
     tar czf entapDBs.tar.gz entapDBs/
     ```
 6. Transfer your entapDBs.tar.gz out of the container to somewhere you can use it in your run. The total file size should be around 6.5 Gb.
-   The default location for the entapDBs.tar.gz is just in the FLAG repo base directory, if this is where you have it then you dont need to specify the location in the run command as this location is already set in the nextflow.config file. 
-   If you want it in a different directory you can specify the global or local location in your run command as such:
-   --entapDB /home/wtroy/FLAG/entapDBs.tar.gz
-   In this case my global path is /home/wtroy/FLAG/entapDBs.tar.gz
+   <p>The default location for the entapDBs.tar.gz is just in the FLAG repo base directory, if this is where you have it then you dont need to specify the location in the run command as this location is already set in the nextflow.config file. </p>
+   <p>If you want it in a different directory you can specify the global or local location in your run command as such:</p>
+   <p>--entapDB /home/wtroy/FLAG/entapDBs.tar.gz</p>
+   <p>In this case my global path is /home/wtroy/FLAG/entapDBs.tar.gz</p>
 
 ## Workflow Diagram
 

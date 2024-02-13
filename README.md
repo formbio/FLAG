@@ -49,6 +49,7 @@ This nextflow workflow can also be run on the Form Bio Platform which has it alr
 ## Setup:
 1. All docker images are currently available in the github repo, they can also be built if desired. Pull them from the github repo: bash pull_docker_images.sh 
 2. If running singularity convert docker images to singularity images and move them to their respective locations (note currently the singularity images must be replaces after every run due to how the singularity temp folders are handled so run this script before each singularity run): bash convert_docker_to_singularity_and_move_to_folders.sh
+3. Make sure your output directory exists and can be written to. If running the example run command you can run the makeDirectories.sh script to do this. 
    
 ## Summary
 
@@ -99,13 +100,13 @@ Currently available run parameters (and descriptions) include:
 --rnadatabaseid (This option is not currently fully supported in the open source version of flag however all code to support it is in the repo and just paths need to be modified. This is for running FLAG with external transcript databases)
 
 ## Example Run commands
-Within the repo all example files from the paper for Erynnis tages are provided, except for the genome assembly which can be downloaded from https://ftp.ensembl.org/pub/rapid-release/species/Erynnis_tages/GCA_905147235.1/braker/genome/Erynnis_tages-GCA_905147235.1-softmasked.fa.gz. Note an EnTap database must still be made.
+Within the repo all example files from the paper for Erynnis tages are provided, except for the genome assembly which can be downloaded from https://ftp.ensembl.org/pub/rapid-release/species/Erynnis_tages/GCA_905147235.1/braker/genome/Erynnis_tages-GCA_905147235.1-softmasked.fa.gz. Note an EnTap database must still be made. Also MAKE SURE that your output directory exists before running and is able to be written to. If the output directory does not exist before running this can lead to errors.
 
-After making the EnTap database and uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff:
-nextflow run -w workdir/ --output outputdir/ --genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa --proteins examples/curatedButterflyProteins.fa --masker skip --transcriptIn true --lineage lepidoptera_odb10 --annotationalgo Helixer,helixer_trained_augustus --helixerModel invertebrate --externalalgo input_transcript,input_proteins,transcript_from_database --size small --proteinalgo miniprot --rnadatabaseid refseq_select_rna --speciesScientificName Eynnis_tages
+After making the EnTap database and uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH docker:
+nextflow run main.nf -w workdir/ --output outputdir/ --genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa --proteins examples/curatedButterflyProteins.fa --masker skip --transcriptIn true --lineage lepidoptera_odb10 --annotationalgo Helixer,helixer_trained_augustus --helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot --speciesScientificName Eynnis_tages -profile docker
 
 If Liftoff is desired the above command can be modified such as below:
-nextflow run -w workdir/ --output outputdir/ --genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa --proteins examples/curatedButterflyProteins.fa --fafile examples/GCF_009731565.1_Dplex_v4_genomic.fa --gtffile examples/GCF_009731565.1_Dplex_v4_genomic.gff --masker skip --transcriptIn true --lineage lepidoptera_odb10 --annotationalgo Liftoff,Helixer,helixer_trained_augustus --helixerModel invertebrate --externalalgo input_transcript,input_proteins,transcript_from_database --size small --proteinalgo miniprot --rnadatabaseid refseq_select_rna --speciesScientificName Eynnis_tages --fafile monarchGenome.fa --gtffile monarchAnnotation.gff3
+nextflow run main.nf -w workdir/ --output outputdir/ --genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa --proteins examples/curatedButterflyProteins.fa --fafile examples/GCF_009731565.1_Dplex_v4_genomic.fa --gtffile examples/GCF_009731565.1_Dplex_v4_genomic.gff --masker skip --transcriptIn true --lineage lepidoptera_odb10 --annotationalgo Liftoff,Helixer,helixer_trained_augustus --helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot --speciesScientificName Eynnis_tages --fafile monarchGenome.fa --gtffile monarchAnnotation.gff3 -profile docker
 
 
 ## Extra Info on Parameters:
@@ -208,7 +209,11 @@ For ease of use we simplify this process and confirm it is working as of August 
     mv entap_database.db entapDBs/
     tar czf entapDBs.tar.gz entapDBs/
     ```
-6. Transfer your entapDBs.tar.gz out of the container to somewhere you can use it in your run. The total file size should be around 6.5 Gb
+6. Transfer your entapDBs.tar.gz out of the container to somewhere you can use it in your run. The total file size should be around 6.5 Gb.
+   <p>The default location for the entapDBs.tar.gz is just in the FLAG repo base directory, if this is where you have it then you dont need to specify the location in the run command as this location is already set in the nextflow.config file. </p>
+   <p>If you want it in a different directory you can specify the global or local location in your run command as such:</p>
+   <p>--entapDB /home/wtroy/FLAG/entapDBs.tar.gz</p>
+   <p>In this case my global path is /home/wtroy/FLAG/entapDBs.tar.gz</p>
 
 ## Workflow Diagram
 
@@ -352,6 +357,11 @@ details on methods can be found in the FLAG paper.
   as closely related as possible to the species of interest. Sometimes
   it may be better to choose a less related species if a species that is
   more closely related has files of poor quality.
+
+## Common Errors
+
+- Make sure you have a profile set when running such as -profile docker
+- Make sure the output directory exists and is writable before running
 
 ## Built With
 

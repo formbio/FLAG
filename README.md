@@ -49,8 +49,8 @@ This nextflow workflow can also be run on the Form Bio Platform which has it alr
 ## Setup:
 1. All docker images are currently available in the github repo, they can also be built if desired. Pull them from the github repo: bash pull_docker_images.sh 
 2. If running singularity directly pull the singularity images or pull the docker images and then convert docker images to singularity images and move them to their respective locations (note currently the singularity images must be replaces after every run due to how the singularity temp folders are handled so run one of the following scripts before each singularity run): 
- to directly pull singularity images: bash direct_pull_singularity_images_and_move_to_folders.sh
- to convert local docker images to singularity: bash convert_docker_to_singularity_and_move_to_folders.sh
+ <p>to directly pull singularity images: bash direct_pull_singularity_images_and_move_to_folders.sh</p>
+ <p>to convert local docker images to singularity: bash convert_docker_to_singularity_and_move_to_folders.sh</p>
 3. Make sure your output directory exists and can be written to. If running the example run command you can run the makeDirectories.sh script to do this. 
    
 ## Summary

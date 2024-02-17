@@ -3,6 +3,9 @@ This is the public repository for FLAG, the Form Bio Genome Annotation Workflow.
 
 ## Table of Contents
 - [Run options:](#run-options)
+  * [Run Platform](#run-platform)
+  * [Computer Sizes](#computer-sizes)
+  * [Containerization](#containerization)
 - [Necessary installs:](#necessary-installs)
 - [Setup:](#setup)
 - [Summary](#summary)
@@ -38,12 +41,23 @@ This is the public repository for FLAG, the Form Bio Genome Annotation Workflow.
 - [Citations](#citations)
   
 ## Run options:
+FLAG has multiple run configurations for run platform, size of computers to run on, and containerization softwares.
+
+### Run Platform
 The official release of FLAG supports running in either GCP (Google Cloud Platform) or locally, default is local. If running on GCP switch out the modules/nf-modules/nfconf/base.config with modules/nf-modules/nfconf/gcp.config.
 
 This nextflow workflow can also be run on the Form Bio Platform which has it already setup and able to run in parallel on the cloud along with an easy to run user interface and precurated rna and protein databases for users. In testing average run costs for bird genomes were around $80 and mammals were around $250. However, this is subject to change and largely dependant on input data sizes.
 
+### Computer Sizes
+1. Normal runs are built for larger compute systems and no flags are needed.
+2. If running on a laptop or computer with constrained resources use the docker_small profile shown in the examples as well as the flag "--runMode laptop"
+
+### Containerization
+1. Docker: use the "docker" or "docker_small" profile. In the future additional functionality may come to docker before it is supported in singularity.
+2. Singularity: use the "singularity" profile
+
 ## Necessary installs:
-1. Docker
+1. Docker or Singularity
 2. Nextflow
    
 ## Setup:
@@ -104,11 +118,20 @@ Currently available run parameters (and descriptions) include:
 ## Example Run commands
 Within the repo all example files from the paper for Erynnis tages are provided, except for the genome assembly which can be downloaded from https://ftp.ensembl.org/pub/rapid-release/species/Erynnis_tages/GCA_905147235.1/braker/genome/Erynnis_tages-GCA_905147235.1-softmasked.fa.gz. Note an EnTap database must still be made. Also MAKE SURE that your output directory exists before running and is able to be written to. If the output directory does not exist before running this can lead to errors.
 
+### Local Docker Run Examples:
 After making the EnTap database and uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH docker:
 nextflow run main.nf -w workdir/ --output outputdir/ --genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa --proteins examples/curatedButterflyProteins.fa --masker skip --transcriptIn true --lineage lepidoptera_odb10 --annotationalgo Helixer,helixer_trained_augustus --helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot --speciesScientificName Eynnis_tages -profile docker
 
 If Liftoff is desired the above command can be modified such as below:
-nextflow run main.nf -w workdir/ --output outputdir/ --genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa --proteins examples/curatedButterflyProteins.fa --fafile examples/GCF_009731565.1_Dplex_v4_genomic.fa --gtffile examples/GCF_009731565.1_Dplex_v4_genomic.gff --masker skip --transcriptIn true --lineage lepidoptera_odb10 --annotationalgo Liftoff,Helixer,helixer_trained_augustus --helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot --speciesScientificName Eynnis_tages --fafile monarchGenome.fa --gtffile monarchAnnotation.gff3 -profile docker
+nextflow run main.nf -w workdir/ --output outputdir/ --genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa --proteins examples/curatedButterflyProteins.fa --fafile examples/GCF_009731565.1_Dplex_v4_genomic.fa --gtffile examples/GCF_009731565.1_Dplex_v4_genomic.gff --masker skip --transcriptIn true --lineage lepidoptera_odb10 --annotationalgo Liftoff,Helixer,helixer_trained_augustus --helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot --speciesScientificName Eynnis_tages --fafile examples/monarchGenome.fa --gtffile examples/monarchAnnotation.gff3 -profile docker
+
+### Local Docker Run Examples for Small Computers or Laptops:
+This has only been tested on smaller genomes under 1Gb on a 16 vCPU, 8 CPU, machine with 32Gb of RAM. It may work for larger genomes but that has not been tested. Note that you are free to change the modules and scripts to your specific compute requirements if you have more or less CPUs and RAM.
+After making the EnTap database and uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH docker:
+nextflow run main.nf -w workdir/ --output outputdir/ --genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa --proteins examples/curatedButterflyProteins.fa --masker skip --transcriptIn true --lineage lepidoptera_odb10 --annotationalgo Helixer,helixer_trained_augustus --helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot --speciesScientificName Eynnis_tages --runMode laptop -profile docker_small
+
+If Liftoff is desired the above command can be modified such as below:
+nextflow run main.nf -w workdir/ --output outputdir/ --genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa --proteins examples/curatedButterflyProteins.fa --fafile examples/GCF_009731565.1_Dplex_v4_genomic.fa --gtffile examples/GCF_009731565.1_Dplex_v4_genomic.gff --masker skip --transcriptIn true --lineage lepidoptera_odb10 --annotationalgo Liftoff,Helixer,helixer_trained_augustus --helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot --speciesScientificName Eynnis_tages --fafile examples/monarchGenome.fa --gtffile examples/monarchAnnotation.gff3 --runMode laptop -profile docker_small
 
 
 ## Extra Info on Parameters:

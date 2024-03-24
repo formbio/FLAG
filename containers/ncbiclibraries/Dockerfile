@@ -104,6 +104,10 @@ ENV PATH "$PATH:/opt/cmake-3.25.3-linux-x86_64/bin"
 RUN cd /opt; git clone https://github.com/ncbi/SKESA.git; cd SKESA; make
 ENV PATH "$PATH:/opt/SKESA/"
 
+RUN cd opt; wget https://github.com/shenwei356/seqkit/releases/download/v2.3.1/seqkit_linux_amd64.tar.gz; tar xvfz seqkit_linux_amd64.tar.gz; cp seqkit /usr/local/bin/
+
+RUN apt-get remove -y libpulse0
+
 # Install Scripts
 ENV repodir /seqprg
 RUN mkdir -p /seqprg;

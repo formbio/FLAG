@@ -40,16 +40,6 @@ if [[ -z ${speciesName} ]]
 then
     speciesName=Sample_species
 fi
-if [[ -s ${flagdb} ]]
-then
-    tar -xf $flagdb
-    #mkdir -p flagdb
-    #tar xvfz ${flagdb} --strip-components=1 -C flagdb
-    mv flagdb/* .
-else
-    echo "Missing Database File"
-    usage
-fi
 if [[ -z ${threads} ]]
 then
     threads=`nproc`

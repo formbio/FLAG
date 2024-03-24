@@ -6,7 +6,7 @@ usage() {
   echo "-g  --input genome file in fasta format"
   echo "-r  --input cDNA or rna file in fasta format"
   echo "-n  --number to split"
-  echo "-p  --parallel"
+  echo "-p  --parallelNum"
   echo "Example: bash splign.sh -g GCF_000001905.1_Loxafr3.0_genomic.fna -p GCF_000001905.1_Loxafr3.0_rna.fna"
   exit 1
 }
@@ -60,16 +60,16 @@ for file in cdna.part_*.fa; do
     padded_number=$(printf "%03d" "$numQueries")
     mv cdna.part_${padded_number}.fa ${numQueries}_folder/cdna.fa
     echo "cd ${numQueries}_folder" >> parallel_${padded_number}.txt
-    echo "cp ../genome.fa* ." >> parallel_${padded_number}.txt
+    echo "cp ../genome.* ." >> parallel_${padded_number}.txt
     echo "splign -mklds ." >> parallel_${padded_number}.txt
     echo "makeblastdb -dbtype nucl -parse_seqids -in cdna.fa" >> parallel_${padded_number}.txt
     #echo "makeblastdb -dbtype nucl -parse_seqids -in genome.fa" >> parallel_${padded_number}.txt
     echo "compart -qdb cdna.fa -sdb genome.fa > cdna.compartments" >> parallel_${padded_number}.txt
     echo "splign -ldsdir . -comps cdna.compartments -asn splign.asn > splign.out" >> parallel_${padded_number}.txt
     echo "annotwriter -i splign.asn -format gff3 -o splign.gff3" >> parallel_${padded_number}.txt
-    echo "splign -mklds ." >> parallel_${padded_number}.txt
+    #echo "splign -mklds ." >> parallel_${padded_number}.txt
     echo "cd .." >> parallel_${padded_number}.txt
-    echo "rm -rf ${numQueries}_folder" >> parallel_${padded_number}.txt
+    #echo "rm -rf ${numQueries}_folder" >> parallel_${padded_number}.txt
     echo "bash parallel_${padded_number}.txt" >> parallel_commands.txt
 done
 
@@ -107,3 +107,4 @@ then
 #    annotwriter -i splign.asn -format gff3 -o splign.gff3
     #cat spligninter.gff3 | awk '{ if ($2 == ".") {$2 = "RefSeq"}; print }' > splign.gff3
 fi
+

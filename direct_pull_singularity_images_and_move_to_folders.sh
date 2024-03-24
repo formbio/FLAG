@@ -1,6 +1,7 @@
 singularity pull flag_cbbasic.image docker://ghcr.io/formbio/flag_cbbasic:latest
 mv flag_cbbasic.image containers/cbbasic/
 cd containers/combinefilter/
+cp -r ../../scripts/ .
 singularity build flag_combinefilter.image Singularity.def
 cd ../../
 singularity pull flag_entap.image docker://ghcr.io/formbio/flag_entap:latest

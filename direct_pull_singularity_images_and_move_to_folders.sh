@@ -26,3 +26,5 @@ singularity pull flag_transdecoder.image docker://ghcr.io/formbio/flag_transdeco
 mv flag_transdecoder.image containers/transdecoder/
 singularity pull flag_trinity.image docker://ghcr.io/formbio/flag_trinity:latest
 mv flag_trinity.image containers/trinity/
+singularity pull flag_augustus.image docker://ghcr.io/formbio/flag_augustus:latest
+mv flag_augustus.image containers/augustus/

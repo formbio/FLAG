@@ -8,6 +8,7 @@ This is the public repository for FLAG, the Form Bio Genome Annotation Workflow.
   * [Containerization](#containerization)
 - [Necessary installs:](#necessary-installs)
 - [Setup:](#setup)
+  * [Summary of Setup Commands](#summary-of-setup-commands)
 - [Summary](#summary)
 - [Run Parameteres:](#run-parameteres)
 - [Example Run commands](#example-run-commands)
@@ -54,7 +55,7 @@ This nextflow workflow can also be run on the Form Bio Platform which has it alr
 
 ### Containerization
 1. Docker: use the "docker" or "docker_small" profile. In the future additional functionality may come to docker before it is supported in singularity.
-2. Singularity: use the "singularity" or "singularity_small" profile
+2. Singularity: use the "singularity" or "singularity_small" profile.
 
 ## Necessary installs:
 1. Docker or Singularity
@@ -69,12 +70,20 @@ This nextflow workflow can also be run on the Form Bio Platform which has it alr
 4. Make sure your output directory exists and can be written to. If running the example run command you can run the makeDirectories.sh script to do this. 
 
 ### Summary of Setup Commands:
+<div>
 ```bash makeDirectories.sh```
+</div>
+<div>
 ```bash setup_eggnogDB.sh```
+</div>
+
 If running from docker pull the docker images:
 ```bash pull_docker_images.sh```
+
 If running singularity you must also make the singularity images:
 ```bash direct_pull_singularity_images_and_move_to_folders.sh```
+Note that when running singularity due to a bug with how temp files are handlered the script reset_pasa.sh must be ran before each run:
+```bash reset_pasa.sh```
    
 ## Summary
 
@@ -219,6 +228,12 @@ StructuralAnnotation/short_summary.specific.*.buscooutLenient.txt BUSCO scores o
 finalAnnots/*.gtf FINAL ANNOTATION with functional annotations added. This is the end output file.
 
 ## Databases
+As of v2.0.0 the Eggnog database is used in favor of the EnTAP database as it is more up to date and easier to build. FLAG can only use EITHER the Eggnog database OR EnTAP database for a singular run.
+
+### Instructions on how to build the Eggnog database
+All that is needed is to run the setup_eggnog.sh script
+```bash setup_eggnog.sh```
+
 ### Instructions on how to build the Entap database
 Your Entap database must contain 5 files in order to be in alignment with our Entap Configuration file used in FLAG:
 eggnog.db             entap_database.bin  uniprot_sprot.dmnd

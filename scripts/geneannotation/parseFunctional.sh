@@ -115,19 +115,19 @@ sed -i '/\tfive_prime_UTR\t/d' final${speciesName}.gff3
 sed -i '/\tthree_prime_UTR\t/d' final${speciesName}.gff3
 
 # make the protein fasta file
-echo "agat_sp_extract_sequences.pl --clean_final_stop --gff final${speciesName}.gff3 -f genome.fa -p -o proteins_${speciesName}.fa" >> parallel_agat_commands.txt
-
+#echo "agat_sp_extract_sequences.pl --clean_final_stop --gff final${speciesName}.gff3 -f genome.fa -p -o proteins_${speciesName}.fa" >> parallel_agat_commands.txt
+agat_sp_extract_sequences.pl --clean_final_stop --gff final${speciesName}.gff3 -f genome.fa -p -o proteins_${speciesName}.fa
 # make the cdna fasta file
-echo "agat_sp_extract_sequences.pl --clean_final_stop --gff final${speciesName}.gff3 -f genome.fa --cdna -o cdna_${speciesName}.fa" >> parallel_agat_commands.txt
-
+#echo "agat_sp_extract_sequences.pl --clean_final_stop --gff final${speciesName}.gff3 -f genome.fa --cdna -o cdna_${speciesName}.fa" >> parallel_agat_commands.txt
+agat_sp_extract_sequences.pl --clean_final_stop --gff final${speciesName}.gff3 -f genome.fa --cdna -o cdna_${speciesName}.fa
 
 # convert gtf to gff to supply both in the final output
 #agat_convert_sp_gxf2gxf.pl -g final${speciesName}.gtf -o final${speciesName}.gff3
 
 # Get agat stats
-echo "agat_sp_statistics.pl --gff final${speciesName}.gff3 --output final${speciesName}.AGAT.stats" >> parallel_agat_commands.txt
-
-parallel < parallel_agat_commands.txt
+#echo "agat_sp_statistics.pl --gff final${speciesName}.gff3 --output final${speciesName}.AGAT.stats" >> parallel_agat_commands.txt
+agat_sp_statistics.pl --gff final${speciesName}.gff3 --output final${speciesName}.AGAT.stats
+#parallel < parallel_agat_commands.txt
 
 # Get busco stats
 conda activate BUSCO

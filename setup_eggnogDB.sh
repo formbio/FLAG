@@ -9,4 +9,5 @@ wget -nH --user-agent=Mozilla/5.0 --relative --no-parent --reject "index.html*" 
 wget -nH --user-agent=Mozilla/5.0 --relative --no-parent --reject "index.html*" --cut-dirs=4 -e robots=off -O eggnog.taxa.tar.gz http://eggnogdb.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz && echo Decompressing... && tar -zxf eggnog.taxa.tar.gz && rm eggnog.taxa.tar.gz
 
 # tar the folder
+cd ..
 tar -zcvf eggnogDB.tar.gz eggnogDB/

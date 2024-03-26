@@ -382,13 +382,29 @@ process miniprot {
   touch trinity_out_dir.Trinity.fasta
   """
 }
+process functionalAnnotation {
+  label 'entap'
+  publishDir "$params.output/functionalAnnotation", mode: 'copy'
+  input:
+    tuple path(input),path(annotation),path(databases),val(program)
+  output:
+    path("*_results.tsv"), emit: functionalAnnot
+    path("*.emapper.*"), emit: eggnogFiles optional true
+  script:
+  """
+  bash ${params.repoDir}/scripts/geneannotation/functionalAnnotation.sh -i ${input} -a ${annotation} -d ${databases} -p ${program}
+  """
+  stub:
+  """
+  touch final_annotations_lvl0.tsv
+  """
+}
 process combinestructwfunct {
   label 'evm'
   publishDir "$params.output/finalAnnots", mode: 'copy'
   publishDir "${params.output}", pattern: '*html', mode: 'copy'
-  errorStrategy  { task.attempt <= maxRetries  ? 'retry' : 'ignore' }
   input:
-    tuple path(entap),path(annotation),val(species),val(lineage),path(genome)
+    tuple path(functionalAnnotation),path(annotation),val(species),val(lineage),path(genome),val(program)
   output:
     path("final*.gtf")
     path("final*.gff3")
@@ -396,11 +412,11 @@ process combinestructwfunct {
     path("cdna_*.fa")
     path("proteins_*.fa")
     path("short_summary.*.buscoout.txt")
-    path("results.html")
-    path("*.gb") optional true
+    path("results.html") optional true
+    path("final*.gb") optional true
   script:
   """
-  bash ${params.repoDir}/scripts/geneannotation/parseEntap.sh -i ${entap} -a ${annotation} -s ${species} -l ${lineage} -g ${genome}
+  bash ${params.repoDir}/scripts/geneannotation/parseFunctional.sh -i ${functionalAnnotation} -a ${annotation} -s ${species} -l ${lineage} -g ${genome} -p ${program}
   """
   stub:
   """

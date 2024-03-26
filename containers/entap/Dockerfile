@@ -47,10 +47,11 @@ RUN apt-get -qq update && DEBIAN_FRONTEND="noninteractive" apt-get -qq -y instal
     python3-pip \
     python3-setuptools \
     emboss \
-    gffread
+    gffread \
+    python3-dev 
   
 RUN pip3 install setuptools
-RUN pip3 install networkx numpy biopython==1.76
+#RUN pip3 install networkx numpy biopython==1.76
 
 RUN curl -L https://cpanmin.us | perl - App::cpanminus
 RUN cpanm install DB_File
@@ -68,17 +69,23 @@ RUN cpanm install IPC::Run --force
 RUN cpanm install Bio::DB::EUtilities
 RUN cd /opt; git clone https://github.com/NBISweden/AGAT.git; cd AGAT; perl Makefile.PL; make; make install 
 
-RUN cd /opt; git clone https://github.com/harta55/EnTAP.git; cd EnTAP; cd libs/diamond-0.8.31; mkdir bin; cd bin; cmake ..; make install; make
+RUN cd /opt; wget https://github.com/harta55/EnTAP/archive/refs/tags/v1.0.1.tar.gz; tar -xf v1.0.1.tar.gz; mv EnTAP-1.0.1 EnTAP; cd EnTAP; cd libs/; tar -xvzf diamond-v2.1.8.tar.gz; cd diamond-2.1.8; mkdir bin; cd bin; cmake ..; make install; make
+
+RUN cd /opt/EnTAP/libs/; tar -xvzf diamond-v2.1.8.tar.gz; cd diamond-2.1.8; mkdir bin; cd bin; cmake ..; make install
+RUN cd /opt/EnTAP/libs/; tar -xvzf RSEM-v1.3.3.tar.gz; cd RSEM-1.3.3; make; make ebseq; make install
+RUN cd /opt/EnTAP/; cmake CMakeLists.txt; make; make install
+#RUN cd /opt; wget https://github.com/harta55/EnTAP/archive/refs/tags/v0.10.9-beta.tar.gz; tar -xf v0.10.9-beta.tar.gz; mv EnTAP-0.10.9-beta EnTAP; cd EnTAP; cd libs/diamond-0.8.31; mkdir bin; cd bin; cmake ..; make install; make
 
 #RUN cd /opt/EnTAP/libs/RSEM-1.3.3; make; make ebseq; make install
-RUN cd /opt/EnTAP/libs/diamond-0.9.9; mkdir bin; cd bin; cmake ..; make install; make
+#RUN cd /opt/EnTAP/libs/diamond-0.9.9; mkdir bin; cd bin; cmake ..; make install; make
 
-RUN cd /opt/EnTAP; cmake CMakeLists.txt; make; make install
+#RUN cd /opt/EnTAP; cmake CMakeLists.txt; make; make install
 
 RUN cd /opt/EnTAP; rm entap_config.ini
 ADD entap_config.ini /opt/EnTAP/
 
-
+RUN pip3 install pip install eggnog-mapper==2.1.12
+#RUN conda install bioconda::eggnog-mapper=2.1.12
 # Install Scripts
 ENV repodir /seqprg
 RUN mkdir -p /seqprg;
@@ -87,4 +94,3 @@ ADD scripts /seqprg/scripts
 ENV PATH "$PATH:/usr/local/bin"
 
 WORKDIR /data/
-

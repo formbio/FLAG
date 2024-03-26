@@ -95,7 +95,7 @@ RUN apt-get update; apt-get -y install samtools genometools
 # install stuff for bioconda genbank conversion
 ADD biopython_environment.yml /opt/biopython_environment.yml
 RUN conda env create -f /opt/biopython_environment.yml
-
+RUN pip3 install pandas 
 # Install Scripts
 ENV repodir /seqprg
 RUN mkdir -p /seqprg;

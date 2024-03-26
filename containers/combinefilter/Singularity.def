@@ -1,0 +1,124 @@
+Bootstrap: docker
+From: ubuntu:20.04
+Stage: spython-base
+
+%files
+env.yml /opt/env.yml
+biopython_environment.yml /opt/biopython_environment.yml
+scripts /seqprg/scripts
+%post
+
+apt-get -qq update && DEBIAN_FRONTEND="noninteractive" apt-get -qq -y install --no-install-recommends \
+automake \
+build-essential \
+ca-certificates \
+bzip2 \
+cmake \
+curl \
+g++ \
+gcc \
+libblas-dev \
+libbz2-dev \
+libcairo2-dev \
+libcurl4-openssl-dev \
+libdb-dev \
+libghc-zlib-dev \
+libjpeg-dev \
+liblzma-dev \
+libncurses-dev \
+libncurses5-dev \
+libpcre3-dev \
+libpng-dev \
+libreadline-dev \
+libreadline-dev \
+libssl-dev \
+libtbb-dev \
+libx11-dev \
+libxml2-dev \
+libxt-dev \
+libzmq3-dev \
+make \
+git \
+perl \
+pkg-config \
+python3 \
+python3-dev \
+python3-distutils \
+python3-pip \
+python3-setuptools \
+rsync \
+texlive-latex-base \
+tzdata \
+unzip \
+wget \
+x11-common \
+zlib1g-dev \
+python \
+python-dev \
+default-jre \
+python-setuptools \
+libdbi-perl \
+parallel \
+gffread
+  
+#perl stuff
+curl -L https://cpanmin.us | perl - App::cpanminus
+cpanm URI::Escape module
+
+#install EVM
+cd /opt; git clone https://github.com/EVidenceModeler/EVidenceModeler.git
+
+#install conda
+wget \
+https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+&& bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda \
+&& rm -f Miniconda3-latest-Linux-x86_64.sh \
+&& chmod -R o+rX /opt/conda
+# change conda for singularity
+PATH="/opt/conda/bin:${PATH}"
+conda init
+conda update -n base -c defaults conda
+conda env create -f /opt/env.yml
+
+#install agat
+cpanm install Clone
+cpanm install Graph::Directed
+cpanm install LWP::UserAgent
+cpanm install Carp
+cpanm install Sort::Naturally File::Share File::ShareDir::Install Moose YAML LWP::Protocol::https
+cpanm install Term::ProgressBar
+cpanm install IPC::Run --force
+cpanm install Bio::DB::EUtilities
+cd /opt; git clone https://github.com/NBISweden/AGAT.git; cd AGAT; perl Makefile.PL; make; make install
+
+#begin gFACs install
+cpanm install Bio::Index::Fasta
+
+cd /opt; wget https://gitlab.com/PlantGenomicsLab/gFACs/-/archive/master/gFACs-master.tar.gz; tar -xf gFACs-master.tar.gz; cd gFACs-master
+
+PATH="$PATH:/opt/gFACs-master/:/opt/gFACs-master/format_scripts/:/opt/gFACs-master/support_scripts/:/opt/gFACs-master/task_scripts/"
+
+apt-get update; apt-get -y install samtools genometools
+# install stuff for bioconda genbank conversion
+conda env create -f /opt/biopython_environment.yml
+pip3 install pandas
+# Install Scripts
+repodir=/seqprg
+mkdir -p /seqprg;
+
+
+PATH="$PATH:/usr/local/bin"
+
+mkdir -p /data/
+cd /data/
+%environment
+export PATH="/opt/conda/bin:${PATH}"
+export PATH="$PATH:/opt/gFACs-master/:/opt/gFACs-master/format_scripts/:/opt/gFACs-master/support_scripts/:/opt/gFACs-master/task_scripts/"
+export repodir=/seqprg
+export PATH="$PATH:/usr/local/bin"
+%runscript
+cd /data/
+exec /bin/bash "$@"
+%startscript
+cd /data/
+exec /bin/bash "$@"

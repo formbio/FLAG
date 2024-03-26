@@ -10,7 +10,7 @@ if (params.repoDir) {
 //input data
 genome = Channel.fromPath(params.genome)
 masker = Channel.from(params.masker)
-entapDB = Channel.fromPath(params.entapDB)
+//entapDB = Channel.fromPath(params.entapDB)
 // Either RepeatMasker or WindowMasker. Repeat for highly characterised species with Dfam libraries and Window for others. Window is ncbi
  
 log.info """\
@@ -45,9 +45,9 @@ log.info """\
 """
 
 if (params.runMode == 'laptop') {
-  include { trinity; exonerate_p2g; exonerate_p2g as homology_exonerate_p2g; augustus; augustus as related_species_augustus; augustus as augustus_pretrained; liftoff; windowmasker; prosplign; prosplign as homology_prosplign; splign; splign as homology_splign; transdecoder; transdecoder as homology_transdecoder; pasa; pasa as homology_pasa; genome2protein; genome2transcriptome; CombineAndFilter; trnascan; entap; Helixer; genomethreader; genomethreader as homology_genomethreader; otherToolTrainAugustus as liftoff_trained_augustus; otherToolTrainAugustus as helixer_trained_augustus; miniprot; miniprot as homology_miniprot; combinestructwfunct; maskingNoLibrary } from './modules/nf-modules/annotation/main.nf'
+  include { trinity; exonerate_p2g; exonerate_p2g as homology_exonerate_p2g; augustus; augustus as related_species_augustus; augustus as augustus_pretrained; liftoff; windowmasker; prosplign; prosplign as homology_prosplign; splign; splign as homology_splign; transdecoder; transdecoder as homology_transdecoder; pasa; pasa as homology_pasa; genome2protein; genome2transcriptome; CombineAndFilter; trnascan; entap; Helixer; genomethreader; genomethreader as homology_genomethreader; otherToolTrainAugustus as liftoff_trained_augustus; otherToolTrainAugustus as helixer_trained_augustus; miniprot; miniprot as homology_miniprot; combinestructwfunct; maskingNoLibrary; functionalAnnotation } from './modules/nf-modules/annotation/main.nf'
 } else {
-  include { trinity; exonerate_p2g; exonerate_p2g as homology_exonerate_p2g; augustus; augustus as related_species_augustus; augustus as augustus_pretrained; liftoff; windowmasker; prosplign; prosplign as homology_prosplign; splign; splign as homology_splign; transdecoder; transdecoder as homology_transdecoder; pasa; pasa as homology_pasa; genome2protein; genome2transcriptome; CombineAndFilter; trnascan; entap; Helixer; genomethreader; genomethreader as homology_genomethreader; otherToolTrainAugustus as liftoff_trained_augustus; otherToolTrainAugustus as helixer_trained_augustus; miniprot; miniprot as homology_miniprot; combinestructwfunct; maskingNoLibrary } from './modules/nf-modules/annotation/main_laptop.nf'
+  include { trinity; exonerate_p2g; exonerate_p2g as homology_exonerate_p2g; augustus; augustus as related_species_augustus; augustus as augustus_pretrained; liftoff; windowmasker; prosplign; prosplign as homology_prosplign; splign; splign as homology_splign; transdecoder; transdecoder as homology_transdecoder; pasa; pasa as homology_pasa; genome2protein; genome2transcriptome; CombineAndFilter; trnascan; entap; Helixer; genomethreader; genomethreader as homology_genomethreader; otherToolTrainAugustus as liftoff_trained_augustus; otherToolTrainAugustus as helixer_trained_augustus; miniprot; miniprot as homology_miniprot; combinestructwfunct; maskingNoLibrary; functionalAnnotation } from './modules/nf-modules/annotation/main_laptop.nf'
 }
 include { removedupsfa as protein_removedupsfa; removedupsfa as rna_removedupsfa; removedupsfa as rprotein_removedupsfa; removedupsfa as rrna_removedupsfa; splitgenomebysize; splitgenomebysize as splitgenomebysizeMasking; combiner as rexoncombiner; combiner as exoncombiner; combiner as rprocombiner; combiner as procombiner; combiner as g2pcombiner; combiner as gthcombiner; combiner as rgthcombiner; combiner as maskingcombiner } from './modules/nf-modules/formatting/main.nf'
 
@@ -322,6 +322,11 @@ workflow {
   .set { filesToFilter }
   
  CombineAndFilter(maskedGenome,filesToFilter,params.lineage,params.size)
- entap(maskedGenome.combine(CombineAndFilter.out.gtfLenient).combine(entapDB))
- combinestructwfunct(entap.out.combine(CombineAndFilter.out.gtfLenient).combine(Channel.from(params.speciesScientificName)).combine(Channel.from(params.lineage)).combine(maskedGenome))
+ if (params.funcAnnotProgram == 'entap') {
+   funcAnnotDB = Channel.fromPath(params.entapDB)
+ } else {
+   funcAnnotDB = Channel.fromPath(params.eggnogDB)
+ }
+  functionalAnnotation(maskedGenome.combine(CombineAndFilter.out.gtfLenient).combine(funcAnnotDB).combine(Channel.from(params.funcAnnotProgram)))
+ combinestructwfunct(functionalAnnotation.out.functionalAnnot.combine(CombineAndFilter.out.gtfLenient).combine(Channel.from(params.speciesScientificName)).combine(Channel.from(params.lineage)).combine(maskedGenome).combine(Channel.from(params.funcAnnotProgram)))
 }

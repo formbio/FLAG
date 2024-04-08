@@ -1,0 +1,25 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+%files
+run_flag_singularity.sh  /opt/run_flag_singularity.sh 
+
+%post
+    # Install necessary packages
+    apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get -qq -y install --no-install-recommends wget openjdk-11-jre-headless git libc6-dev squashfs-tools-ng
+
+    # Install Singularity (simplified; follow official instructions for details)
+    wget -O- https://github.com/sylabs/singularity/releases/download/v4.1.0/singularity-ce_4.1.0-jammy_amd64.deb > singularity.deb
+    DEBIAN_FRONTEND="noninteractive" apt-get -qq -y install --no-install-recommends ./singularity.deb
+
+    # Install Nextflow
+    wget -qO- https://get.nextflow.io | bash
+    mv nextflow /usr/local/bin/
+
+    cd /opt; git clone https://github.com/formbio/FLAG.git
+    cd /opt/FLAG; bash makeDirectories.sh; bash direct_pull_singularity_images_and_move_to_folders.sh; bash setup_eggnogDB.sh
+
+%environment
+
+%runscript
+    # Forward commands to Nextflow

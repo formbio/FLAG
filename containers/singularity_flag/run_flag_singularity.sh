@@ -2,7 +2,7 @@
 #run_flag_singularity.sh
 
 usage() {
-  echo "-h Help documentation for liftoff.sh"
+  echo "-h Help documentation for run_flag_singularity.sh"
   echo "-g  --input genome file in fasta format"
   echo "-r  --input rna or transcript file in fasta format"
   echo "-p  --input protein file in fasta format"
@@ -17,14 +17,14 @@ usage() {
   echo "-n  --speciesScientificName"
   echo "-w  --proteinalgo"
   echo "-y  --runMode"
-  echo "-p  --profile"
+  echo "-u  --profile"
   echo "-o  --output"
-  echo "Example: bash run_flag_singularity.sh -g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa -p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 -z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages -w miniprot -y normal -p singularity -o outputdir"
+  echo "Example: bash run_flag_singularity.sh -g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa -p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 -z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages -w miniprot -y normal -u singularity -o outputdir"
   exit 1
 }
 
 OPTIND=1 # Reset OPTIND
-while getopts :g:r:p:m:t:f:a:l:z:q:s:n:w:y:p:o:h opt
+while getopts :g:r:p:m:t:f:a:l:z:q:s:n:w:y:u:o:h opt
 do
     case $opt in
         g) genome=$OPTARG;;
@@ -41,7 +41,7 @@ do
         n) speciesScientificName=$OPTARG;;
         w) proteinalgo=$OPTARG;;
         y) runMode=$OPTARG;;
-        p) profile=$OPTARG;;
+        u) profile=$OPTARG;;
         o) output=$OPTARG;;
         h) usage;;
     esac

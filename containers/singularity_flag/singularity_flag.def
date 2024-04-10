@@ -23,3 +23,4 @@ run_flag_singularity.sh  /opt/run_flag_singularity.sh
 
 %runscript
     # Forward commands to Nextflow
+    bash /opt/run_flag_singularity.sh $@

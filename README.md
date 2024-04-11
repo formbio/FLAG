@@ -8,10 +8,12 @@ This is the public repository for FLAG, the Form Bio Genome Annotation Workflow.
   * [Containerization](#containerization)
 - [Necessary installs:](#necessary-installs)
 - [Setup:](#setup)
-  * [Summary of Setup Commands](#summary-of-setup-commands)
+  * [Setup for Docker](#setup-for-docker)
+  * [Setup for Singularity](#setup-for-singularity)
 - [Summary](#summary)
 - [Run Parameteres:](#run-parameteres)
-- [Example Run commands](#example-run-commands)
+- [Example Docker Run commands](#example-docker-run-commands)
+- [Example Singularity Run commands](#example-singularity-run-commands)
 - [Extra Info on Parameters:](#extra-info-on-parameters)
   * [genome](#genome)
   * [masker](#masker)
@@ -28,7 +30,8 @@ This is the public repository for FLAG, the Form Bio Genome Annotation Workflow.
   * [Transdecoder](#transdecoder)
 - [Extra Info on Output Files:](#extra-info-on-output-files)
 - [Databases](#databases)
-  * [Instructions on how to build the Entap database](#instructions-on-how-to-build-the-entap-database)
+  * [Instructions on how to build the Eggnog database if running Docker](#instructions-on-how-to-build-the-eggnog-database-if-running-docker)
+  * [Instructions on how to build the Entap database if running Docker](#instructions-on-how-to-build-the-entap-database-if-running-docker)
 - [Workflow Diagram](#workflow-diagram)
   * [1. Protein Workflow](#1-protein-workflow)
   * [2. RNA Workflow](#2-rna-workflow)
@@ -59,17 +62,23 @@ This nextflow workflow can also be run on the Form Bio Platform which has it alr
 
 ## Necessary installs:
 1. Docker or Singularity
-2. Nextflow
+2. Nextflow if using Docker
    
 ## Setup:
-1. All docker images are currently available in the github repo, they can also be built if desired. Pull them from the github repo: bash pull_docker_images.sh 
-2. If running singularity directly pull the singularity images or pull the docker images and then convert docker images to singularity images and move them to their respective locations (note currently the singularity images must be replaces after every run due to how the singularity temp folders are handled so run one of the following scripts before each singularity run): 
- <p>to directly pull singularity images: bash direct_pull_singularity_images_and_move_to_folders.sh</p>
-3. Make the eggnog database:
- <p>bash setup_eggnogDB.sh</p>
-4. Make sure your output directory exists and can be written to. If running the example run command you can run the makeDirectories.sh script to do this. 
+There are currently 2 way to run FLAG. These being either Docker or Singularity. 
+Docker is easy to run through normal nextflow and is the default way to run FLAG. 
+It is also recognized that many people use HPCs with Singularity. However, 
+Singularity can be more finicky. Due to this the entirety of FLAG has been 
+packaged in a large singularity container, changing how it is run verses 
+normal nextflow.
 
-### Summary of Setup Commands:
+### Setup for Docker:
+1. All docker images are currently available in the github repo, they can also be built if desired. Pull them from the github repo: bash pull_docker_images.sh 
+2. Make the eggnog database:
+ <p>bash setup_eggnogDB.sh</p>
+3. Make sure your output directory exists and can be written to. If running the example run command you can run the makeDirectories.sh script to do this. 
+
+#### Summary of DOCKER Setup Commands:
 ```bash
 bash makeDirectories.sh
 bash setup_eggnogDB.sh
@@ -80,13 +89,13 @@ If running from docker pull the docker images:
 bash pull_docker_images.sh
 ```
 
-If running singularity you must also make the singularity images:
+### Setup for Singularity:
+The entirety of FLAG with the eggnog database is in a single singularity image that can be built by the
+user. To simplify this building process a script can be run to build it and move
+it to the examples directory in the FLAG repo.
+
 ```bash 
-bash direct_pull_singularity_images_and_move_to_folders.sh
-```
-Note that when running singularity due to a bug with how temp files are handlered the script reset_pasa.sh must be ran before each run:
-```bash 
-bash reset_pasa.sh
+bash build_singularity_flag.sh
 ```
    
 ## Summary
@@ -104,7 +113,7 @@ structural annotation is then formatted uniformly to be similar to that
 of the NCBI and then functionally annotated with Entap.
 
 ## Run Parameteres:
-Currently available run parameters (and descriptions) include: 
+Currently available Nextflow run parameters (and descriptions) include: 
 --genome (REQUIRED. This is the genome assembly fasta file you are annotating)
 
 --masker (REQUIRED. Default is skip. This is used to signify if masking of the genome has been done yet, if it has then skip should be selected. If no masking has been done there are multiple masking options that can be run. Details on masking are in the masker section below)
@@ -137,8 +146,8 @@ Currently available run parameters (and descriptions) include:
 
 --rnadatabaseid (This option is not currently fully supported in the open source version of flag however all code to support it is in the repo and just paths need to be modified. This is for running FLAG with external transcript databases)
 
-## Example Run commands
-Within the repo all example files from the paper for Erynnis tages are provided, except for the genome assembly which can be downloaded from https://ftp.ensembl.org/pub/rapid-release/species/Erynnis_tages/GCA_905147235.1/braker/genome/Erynnis_tages-GCA_905147235.1-softmasked.fa.gz. Note an EnTap database must still be made. Also MAKE SURE that your output directory exists before running and is able to be written to. If the output directory does not exist before running this can lead to errors.
+## Example Docker Run commands
+Within the repo all example files from the paper for Erynnis tages are provided, except for the genome assembly which can be downloaded from https://ftp.ensembl.org/pub/rapid-release/species/Erynnis_tages/GCA_905147235.1/braker/genome/Erynnis_tages-GCA_905147235.1-softmasked.fa.gz. Note an Eggnog database must still be made if running nextflow with docker, for the large singularity container it is already built. Also MAKE SURE that your output directory exists before running and is able to be written to. If the output directory does not exist before running this can lead to errors.
 
 ### Local Docker Run Examples:
 After making the EnTap database and uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH docker:
@@ -189,52 +198,74 @@ nextflow run main.nf -w workdir/ --output outputdir/ \
 --eggnogDB eggnogDB.tar.gz -profile docker_small
 ```
 
+## Example Singularity Run commands
+Within the repo all example files from the paper for Erynnis tages are provided, except for the genome assembly which can be downloaded from https://ftp.ensembl.org/pub/rapid-release/species/Erynnis_tages/GCA_905147235.1/braker/genome/Erynnis_tages-GCA_905147235.1-softmasked.fa.gz. The Eggnog database is prebuilt inside of the singularity_flag image and the output directory will be make for you. You must however make a temp directory which will store temporary files made during the run which must be unique for every run and not reused as this will break the run if it is not clean each time.
+
+The major thing of note is that the flags for the run parameters change slightly when running from the singularity_flag image as the entrypoint for the image is a script instead of Nextflow. The flags are the same as running with Nextflow except just have different call sign which are below:
+-h Help documentation for run_flag_singularity.sh
+-g  (input genome file in fasta format)
+-r  (input rna or transcript file in fasta format)
+-p  (input protein file in fasta format)
+-m  (masker)
+-t  (transcriptIn)
+-f  (fafile)
+-a  (gtffile which is the annotation file in gtf or gff3 format)
+-l  (lineage)
+-z  (annotationalgo such as Helixer,helixer_trained_augustus)
+-q  (helixerModel)
+-s  (size (normal or small))
+-n  (speciesScientificName)
+-w  (proteinalgo)
+-y  (runMode)
+-u  (profile)
+-o  (output folder name)
+
 ### Local Singularity Run Examples:
-After making the EnTap database and uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH Singularity:
+After uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH Singularity where $(pwd)/tempdir is your clean temporary directory for the run:
 ```bash
-nextflow run main.nf -w workdir/ --output outputdir/ \
---genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa \
---proteins examples/curatedButterflyProteins.fa --masker skip --transcriptIn true \
---lineage lepidoptera_odb10 --annotationalgo Helixer,helixer_trained_augustus --helixerModel invertebrate \
---externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot \
---speciesScientificName Eynnis_tages --funcAnnotProgram eggnog --eggnogDB eggnogDB.tar.gz -profile singularity
+singularity run --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp \
+--overlay $(pwd)/tempdir  singularity_flag.image \
+-g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
+-p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 \
+-z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
+-w miniprot -y normal -p singularity -o outputdir -u singularity
 ```
 
 If Liftoff is desired the above command can be modified such as below:
 ```bash
-nextflow run main.nf -w workdir/ --output outputdir/ \
---genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa \
---proteins examples/curatedButterflyProteins.fa --fafile examples/GCF_009731565.1_Dplex_v4_genomic.fa \
---gtffile examples/GCF_009731565.1_Dplex_v4_genomic.gff --masker skip --transcriptIn true \
---lineage lepidoptera_odb10 --annotationalgo Liftoff,Helixer,helixer_trained_augustus \
---helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot \
---speciesScientificName Eynnis_tages --fafile examples/monarchGenome.fa --gtffile examples/monarchAnnotation.gff3 \
---funcAnnotProgram eggnog --eggnogDB eggnogDB.tar.gz -profile singularity
+singularity run --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp \
+--overlay $(pwd)/tempdir  singularity_flag.image \
+-g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
+-p curatedButterflyProteins.fa -f GCF_009731565.1_Dplex_v4_genomic.fa \
+-a GCF_009731565.1_Dplex_v4_genomic.gff -m skip -t true \
+-l lepidoptera_odb10 \
+-z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
+-w miniprot -y normal -p singularity -o outputdir -u singularity
 ```
 
 ### Local Singularity Run Examples for Small Computers or Laptops:
 This has only been tested on smaller genomes under 1Gb on a 16 vCPU, 8 CPU, machine with 32Gb of RAM. It may work for larger genomes but that has not been tested. Note that you are free to change the modules and scripts to your specific compute requirements if you have more or less CPUs and RAM.
-After making the EnTap database and uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH Singularity:
+
+After uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH Singularity where $(pwd)/tempdir is your clean temporary directory for the run:
 ```bash
-nextflow run main.nf -w workdir/ --output outputdir/ \
---genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa \
---proteins examples/curatedButterflyProteins.fa --masker skip --transcriptIn true \
---lineage lepidoptera_odb10 --annotationalgo Helixer,helixer_trained_augustus --helixerModel invertebrate \
---externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot \
---speciesScientificName Eynnis_tages --runMode laptop --funcAnnotProgram eggnog \
---eggnogDB eggnogDB.tar.gz -profile singularity_small
+singularity run --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp \
+--overlay $(pwd)/tempdir  singularity_flag.image \
+-g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
+-p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 \
+-z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
+-w miniprot -y normal -p singularity -o outputdir -y laptop -u singularity_small
 ```
 
 If Liftoff is desired the above command can be modified such as below:
 ```bash
-nextflow run main.nf -w workdir/ --output outputdir/ \
---genome examples/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna examples/curatedButterflyRNA.fa \
---proteins examples/curatedButterflyProteins.fa --fafile examples/GCF_009731565.1_Dplex_v4_genomic.fa \
---gtffile examples/GCF_009731565.1_Dplex_v4_genomic.gff --masker skip --transcriptIn true \
---lineage lepidoptera_odb10 --annotationalgo Liftoff,Helixer,helixer_trained_augustus \
---helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot \
---speciesScientificName Eynnis_tages --fafile examples/monarchGenome.fa --gtffile examples/monarchAnnotation.gff3 \
---runMode laptop --funcAnnotProgram eggnog --eggnogDB eggnogDB.tar.gz -profile singularity_small
+singularity run --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp \
+--overlay $(pwd)/tempdir  singularity_flag.image \
+-g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
+-p curatedButterflyProteins.fa -f GCF_009731565.1_Dplex_v4_genomic.fa \
+-a GCF_009731565.1_Dplex_v4_genomic.gff -m skip -t true \
+-l lepidoptera_odb10 \
+-z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
+-w miniprot -y normal -p singularity -o outputdir -y laptop -u singularity_small
 ```
 
 ## Extra Info on Parameters:
@@ -300,13 +331,13 @@ finalAnnots/*.gtf FINAL ANNOTATION with functional annotations added. This is th
 ## Databases
 As of v2.0.0 the Eggnog database is used in favor of the EnTAP database as it is more up to date and easier to build. FLAG can only use EITHER the Eggnog database OR EnTAP database for a singular run.
 
-### Instructions on how to build the Eggnog database
+### Instructions on how to build the Eggnog database if running Docker
 All that is needed is to run the setup_eggnog.sh script
 ```bash 
 bash setup_eggnog.sh
 ```
 
-### Instructions on how to build the Entap database
+### Instructions on how to build the Entap database if running Docker
 Your Entap database must contain 5 files in order to be in alignment with our Entap Configuration file used in FLAG:
 eggnog.db             entap_database.bin  uniprot_sprot.dmnd
 eggnog_proteins.dmnd  entap_database.db

@@ -1,5 +1,6 @@
 import pandas as pd
 import argparse
+import re
 
 parser = argparse.ArgumentParser(description="Process gene annotation and related files.")
 
@@ -21,6 +22,7 @@ simplified_functional_dict = pd.Series(simplified_functional_df.iloc[:, 1:].valu
 def adjust_annotations_for_tRNA_with_line_numbers_and_unique_ids(input_file_path, output_file_path):
     annotations = []
     dummy_gene_counter = 1
+    last_gene_biotype = None  # Add a variable to track the last non-exon gene_biotype
 
     with open(input_file_path, 'r') as infile:
         annotations = infile.readlines()
@@ -33,25 +35,77 @@ def adjust_annotations_for_tRNA_with_line_numbers_and_unique_ids(input_file_path
 
         parts = line.strip().split('\t')
         feature_type = parts[2]
-
-        if feature_type in ['tRNA', 'exon']:
+        annotation_tool = parts[1]
+        start_site = parts[4]
+        
+        # If it's a gene, tRNA, or pseudogene, update the last_gene_biotype variable
+        if feature_type in ['gene', 'pseudogene', 'tRNA']:
             attributes = parse_attributes(parts[8])
-            # Update only if we have previously inserted a dummy gene
-            if corrected_annotations and 'dummy_gene_' in corrected_annotations[-1]:
-                attributes['gene_id'] = last_dummy_gene_id
-                attributes['transcript_id'] = f"{last_dummy_gene_id}.t1"
-                if feature_type == 'exon':
-                    currentID = attributes['ID']
-                    newExonNum = currentID.split('.exon', 1)[-1]
-                    attributes['ID'] = f"{last_dummy_gene_id}.t1.exon{newExonNum}"
-                    attributes['Parent'] = f"{last_dummy_gene_id}.t1"
-                else:
-                    attributes['ID'] = f"{last_dummy_gene_id}.t1"
-                    attributes['Parent'] = f"{last_dummy_gene_id}"
-                parts[8] = '; '.join([f'{k} "{v}"' for k, v in attributes.items()]) + ';'
-                line = '\t'.join(parts) + '\n'
+            last_gene_biotype = attributes.get('gene_biotype', None)
 
-        if feature_type == 'tRNA':
+        if feature_type in ['tRNA', 'exon', 'RNA']:
+            attributes = parse_attributes(parts[8])
+            if feature_type == 'exon' and annotation_tool == 'tRNAscan-SE' and last_gene_biotype:
+                # print(parts)
+                # print(last_gene_biotype)
+                attributes['gene_biotype'] = last_gene_biotype  # Set the exon's biotype based on the last gene/pseudogene/tRNA
+            
+                # Update only if we have previously inserted a dummy gene
+                if corrected_annotations and 'dummy_gene_' in corrected_annotations[-1]:
+                    attributes['gene_id'] = last_dummy_gene_id
+                    attributes['transcript_id'] = f"{last_dummy_gene_id}.t1"
+                    if feature_type == 'exon':
+                        currentID = attributes['ID']
+                        newExonNum = currentID.split('.exon', 1)[-1]
+                        attributes['ID'] = f"{last_dummy_gene_id}.t1.exon{newExonNum}"
+                        attributes['Parent'] = f"{last_dummy_gene_id}.t1"
+                    else:
+                        attributes['ID'] = f"{last_dummy_gene_id}.t1"
+                        attributes['Parent'] = f"{last_dummy_gene_id}"
+                    parts[8] = '; '.join([f'{k} "{v}"' for k, v in attributes.items()]) + ';'
+                    line = '\t'.join(parts) + '\n'
+                else:
+                    parts[8] = '; '.join([f'{k} "{v}"' for k, v in attributes.items()]) + ';'
+                    line = '\t'.join(parts) + '\n'
+            elif feature_type == 'RNA':
+                attributes['gene_biotype'] = last_gene_biotype  # Set the exon's biotype based on the last gene/pseudogene/tRNA
+                parts[2] = 'tRNA'  # Ensure this line remains a tRNA entry
+
+                # Update only if we have previously inserted a dummy gene
+                if corrected_annotations and 'dummy_gene_' in corrected_annotations[-1]:
+                    attributes['gene_id'] = last_dummy_gene_id
+                    attributes['transcript_id'] = f"{last_dummy_gene_id}.t1"
+                    if feature_type == 'exon':
+                        currentID = attributes['ID']
+                        newExonNum = currentID.split('.exon', 1)[-1]
+                        attributes['ID'] = f"{last_dummy_gene_id}.t1.exon{newExonNum}"
+                        attributes['Parent'] = f"{last_dummy_gene_id}.t1"
+                    else:
+                        attributes['ID'] = f"{last_dummy_gene_id}.t1"
+                        attributes['Parent'] = f"{last_dummy_gene_id}"
+                    parts[8] = '; '.join([f'{k} "{v}"' for k, v in attributes.items()]) + ';'
+                    line = '\t'.join(parts) + '\n'
+                else:
+                    parts[8] = '; '.join([f'{k} "{v}"' for k, v in attributes.items()]) + ';'
+                    line = '\t'.join(parts) + '\n'
+            else:
+                # Update only if we have previously inserted a dummy gene
+                if corrected_annotations and 'dummy_gene_' in corrected_annotations[-1]:
+                    attributes['gene_id'] = last_dummy_gene_id
+                    attributes['transcript_id'] = f"{last_dummy_gene_id}.t1"
+                    if feature_type == 'exon':
+                        currentID = attributes['ID']
+                        newExonNum = currentID.split('.exon', 1)[-1]
+                        attributes['ID'] = f"{last_dummy_gene_id}.t1.exon{newExonNum}"
+                        attributes['Parent'] = f"{last_dummy_gene_id}.t1"
+                    else:
+                        attributes['ID'] = f"{last_dummy_gene_id}.t1"
+                        attributes['Parent'] = f"{last_dummy_gene_id}"
+                    parts[8] = '; '.join([f'{k} "{v}"' for k, v in attributes.items()]) + ';'
+                    line = '\t'.join(parts) + '\n'
+            
+
+        if feature_type == 'tRNA' or feature_type == 'RNA':
             # Check if the previous line is not a gene or pseudogene
             if i == 0 or not (annotations[i-1].split('\t')[2] in ['gene', 'pseudogene']):
                 dummy_gene_line, dummy_gene_id = generate_dummy_gene_line_based_on_tRNA(parts, dummy_gene_counter)
@@ -66,6 +120,10 @@ def adjust_annotations_for_tRNA_with_line_numbers_and_unique_ids(input_file_path
                 line = '\t'.join(parts) + '\n'
 
         corrected_annotations.append(line)
+        
+        if attributes['gene_id'] == 'agat-pseudogene-1':
+            print('yes')
+            print(line)
 
     with open(output_file_path, 'w') as outfile:
         for annotation in corrected_annotations:
@@ -120,7 +178,9 @@ def load_annotations_with_transcripts(annotation_file_path):
                 continue  # Skip header lines or empty lines
             parts = line.strip().split('\t')
             feature_type = parts[2]
+            # print(parts)
             attributes = parse_attributes(parts[8])
+
 
             # Check if the entry is a gene, pseudogene, mRNA, or related to either (not 'five_prime_utr', 'three_prime_utr' for now)
             if feature_type in ['gene', 'RNA', 'tRNA', 'pseudogene', 'mRNA', 'exon', 'CDS'] and ('gene_id' in attributes or 'transcript_id' in attributes):
@@ -141,12 +201,30 @@ def load_annotations_with_transcripts(annotation_file_path):
     return gene_related_entries
 
 # Updated to parse both gene_id and transcript_id
+# def parse_attributes(attributes_str):
+#     attributes = {}
+#     for attr in attributes_str.split(';'):
+#         if attr.strip():  # Ensure non-empty strings
+#             print(attr.strip())
+#             key, value = attr.strip().split(' ', 1)
+#             attributes[key.strip()] = value.strip('"')
+#     return attributes
 def parse_attributes(attributes_str):
+    """
+    Parse a string of GTF attributes into a dictionary using regex to handle
+    semicolons and spaces within quoted values correctly.
+    """
     attributes = {}
-    for attr in attributes_str.split(';'):
-        if attr.strip():  # Ensure non-empty strings
-            key, value = attr.strip().split(' ', 1)
-            attributes[key.strip()] = value.strip('"')
+    # Regex pattern to match key-value pairs where value is wrapped in quotes
+    # and may contain semicolons or spaces.
+    pattern = re.compile(r'([^;]+) "(.*?)"(?=;|$)')
+    
+    for match in pattern.finditer(attributes_str):
+        key, value = match.groups()
+        key = key.strip()
+        if key:  # Ensure key is not empty
+            attributes[key] = value.strip()
+
     return attributes
 
 # Use the updated function
@@ -177,8 +255,9 @@ def add_functional_annotations_optimized(annotations, functional_dict):
                     'eggnog_ortholog': functional_annot[0],
                     'gene_name': gene_name,
                     'eggnog_taxscope': eggnog_taxscope,
-                    'gene_description': functional_annot[2]
+                    'gene_description': functional_annot[2].replace(';','')
                 }
+
                 updated = True  # Set flag to true to indicate updates are ready to apply
                 
         # If updates are found, apply them to all entries of the gene instance
@@ -224,8 +303,8 @@ def reformat_and_number_exons(annotations):
                     entry['attributes']['gene_biotype'] = "tRNA"
             elif entry['type'] == "pseudogene":
                 entry['attributes']['ID'] = f"{formbioid}"
-                entry['type'] = "gene"
-                fields[2] = "gene"
+                entry['type'] = "pseudogene"
+                fields[2] = "pseudogene"
             elif entry['type'] == "RNA" or entry['type'] == "tRNA":
                 entry['attributes']['ID'] = f"{formbioid}.t1"
                 entry['attributes']['Parent'] = f"{formbioid}"
@@ -240,16 +319,21 @@ def reformat_and_number_exons(annotations):
                 entry['attributes']['Parent'] = f"{formbioid}"
             if 'gene_biotype' in entry['attributes']:
                 if entry['attributes']['gene_biotype'] == "pseudogene":
-                    entry['attributes']['gene_biotype'] = "tRNA"
+                    entry['attributes']['gene_biotype'] = "pseudogene"
                 elif 'anticodon' in entry['attributes']:
-                    entry['attributes']['gene_biotype'] = "tRNA"
+                    if entry['attributes']['gene_biotype'] != "pseudogene":
+                        entry['attributes']['gene_biotype'] = "tRNA"
                 elif annotationTool == "tRNAscan-SE":
-                    entry['attributes']['gene_biotype'] = "tRNA"
+                    if entry['attributes']['gene_biotype'] != "pseudogene":
+                        entry['attributes']['gene_biotype'] = "tRNA"
                 elif entry['attributes']['gene_biotype'] != "tRNA":
-                    entry['attributes']['gene_biotype'] = "protein_coding"
+                    if entry['attributes']['gene_biotype'] != "pseudogene":
+                        entry['attributes']['gene_biotype'] = "protein_coding"
             else:
                 if annotationTool == "tRNAscan-SE":
-                    entry['attributes']['gene_biotype'] = "tRNA"
+                    print(entry)
+                    if entry['attributes']['gene_biotype'] != "pseudogene":
+                        entry['attributes']['gene_biotype'] = "tRNA"
                 else:
                     entry['attributes']['gene_biotype'] = 'protein_coding'
 
@@ -267,6 +351,7 @@ def reformat_and_number_exons(annotations):
             if entry['type'] == "exon":
                 entry['attributes']['Parent'] = f"{formbioid}.t1"
                 currentID = entry['attributes']['ID']
+                # print(f"{annotationTool}: {currentID}")
                 # print(annotationTool)
                 if annotationTool == "Helixer":
                     # Splitting the string by '.exon.' and taking the part after it
@@ -279,6 +364,8 @@ def reformat_and_number_exons(annotations):
                     currentID_exon = currentID_exon.split('"', 1)[0]
                     # Then, finding the substring before the first quote
                     exonNum = currentID_exon.split('-', 1)[-1]
+                    if 'exon' in exonNum:
+                        exonNum = currentID.split('.exon', 1)[-1]
                 elif annotationTool == "tRNAscan-SE":
                     # Splitting the string by '.exon.' and taking the part after it
                     exonNum = currentID.split('.exon', 1)[-1]
@@ -333,4 +420,5 @@ with open(output_file, 'w') as file:
     for gene_entries in updated_annotations_2.values():
         for entry in gene_entries:
             file.write(entry['raw_line'] + '\n')  # Writing the raw_line directly, it's already updated in previous steps
+
 

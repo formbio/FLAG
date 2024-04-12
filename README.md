@@ -239,7 +239,7 @@ singularity run --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp \
 -p curatedButterflyProteins.fa -f GCF_009731565.1_Dplex_v4_genomic.fa \
 -a GCF_009731565.1_Dplex_v4_genomic.gff -m skip -t true \
 -l lepidoptera_odb10 \
--z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
+-z Liftoff,Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
 -w miniprot -y normal -p singularity -o outputdir -u singularity
 ```
 
@@ -264,7 +264,7 @@ singularity run --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp \
 -p curatedButterflyProteins.fa -f GCF_009731565.1_Dplex_v4_genomic.fa \
 -a GCF_009731565.1_Dplex_v4_genomic.gff -m skip -t true \
 -l lepidoptera_odb10 \
--z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
+-z Liftoff,Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
 -w miniprot -y normal -p singularity -o outputdir -y laptop -u singularity_small
 ```
 

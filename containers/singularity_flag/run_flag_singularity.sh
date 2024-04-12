@@ -185,6 +185,6 @@ ${rnaCommand} ${proteinCommand} \
 ${fafileCommand} ${gtffileCommand} \
 ${maskingCommand} ${transcriptInCommand} ${lineageCommand} \
 ${annotationalgoCommand} ${helixerModelCommand} \
-${externalalgoCommand} ${sizeCommand} ${proteinalgo} \
+${externalalgoCommand} ${sizeCommand} ${proteinalgoCommand} \
 ${speciesScientificName} --funcAnnotProgram eggnog --eggnogDB /opt/FLAG/eggnogDB.tar.gz \
 ${runModeCommand} ${profileCommand}

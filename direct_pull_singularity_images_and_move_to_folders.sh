@@ -1,5 +1,5 @@
 echo "Pulling flag_augustus"
-singularity pull flag_augustus.image docker://ghcr.io/formbio/flag_augustus:latest
+singularity pull flag_augustus.image docker://ghcr.io/formbio/flag_augustus_singularity:latest
 mv flag_augustus.image containers/augustus/
 
 echo "Pulling flag_cbbasic"

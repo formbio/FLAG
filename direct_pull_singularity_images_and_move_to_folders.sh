@@ -1,3 +1,5 @@
+singularity pull flag_augustus.image docker://ghcr.io/formbio/flag_augustus:latest
+mv flag_augustus.image containers/augustus/
 singularity pull flag_cbbasic.image docker://ghcr.io/formbio/flag_cbbasic:latest
 mv flag_cbbasic.image containers/cbbasic/
 cd containers/combinefilter/
@@ -16,8 +18,8 @@ singularity pull flag_liftoff.image docker://ghcr.io/formbio/flag_liftoff:latest
 mv flag_liftoff.image containers/liftoff/
 singularity pull flag_ncbiclibraries.image docker://ghcr.io/formbio/flag_ncbiclibraries:latest
 mv flag_ncbiclibraries.image containers/ncbiclibraries/
-singularity pull flag_ncbitools.image docker://ghcr.io/formbio/flag_ncbitools:latest
-mv flag_ncbitools.image containers/ncbitools/
+# singularity pull flag_ncbitools.image docker://ghcr.io/formbio/flag_ncbitools:latest
+# mv flag_ncbitools.image containers/ncbitools/
 singularity pull flag_pasa.image docker://ghcr.io/formbio/flag_pasa:latest
 mv flag_pasa.image containers/pasa/
 singularity pull flag_tetools.image docker://ghcr.io/formbio/flag_tetools:latest
@@ -26,5 +28,5 @@ singularity pull flag_transdecoder.image docker://ghcr.io/formbio/flag_transdeco
 mv flag_transdecoder.image containers/transdecoder/
 singularity pull flag_trinity.image docker://ghcr.io/formbio/flag_trinity:latest
 mv flag_trinity.image containers/trinity/
-singularity pull flag_augustus.image docker://ghcr.io/formbio/flag_augustus:latest
-mv flag_augustus.image containers/augustus/
+# singularity pull flag_augustus.image docker://ghcr.io/formbio/flag_augustus:latest
+# mv flag_augustus.image containers/augustus/

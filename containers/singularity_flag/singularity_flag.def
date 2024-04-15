@@ -16,7 +16,7 @@ run_flag_singularity.sh  /opt/run_flag_singularity.sh
     wget -qO- https://get.nextflow.io | bash
     mv nextflow /usr/local/bin/
 
-    cd /opt; git clone https://github.com/formbio/FLAG.git
+    cd /opt; git clone https://github.com/formbio/FLAG.git; cd FLAG; git checkout v2.0.0
     cd /opt/FLAG; bash makeDirectories.sh; bash direct_pull_singularity_images_and_move_to_folders.sh; bash setup_eggnogDB.sh
 
 %environment

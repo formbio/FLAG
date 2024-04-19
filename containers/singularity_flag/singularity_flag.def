@@ -11,16 +11,43 @@ run_flag_singularity.sh  /opt/run_flag_singularity.sh
     # Install Singularity (simplified; follow official instructions for details)
     wget -O- https://github.com/sylabs/singularity/releases/download/v4.1.0/singularity-ce_4.1.0-jammy_amd64.deb > singularity.deb
     DEBIAN_FRONTEND="noninteractive" apt-get -qq -y install --no-install-recommends ./singularity.deb
+    singularity config global --set 'allow setuid' 'no'
 
     # Install Nextflow
     wget -qO- https://get.nextflow.io | bash
     mv nextflow /usr/local/bin/
+    # Ensure it is executable
+    chmod a+rx /usr/local/bin/nextflow
+
+    # Create a directory for Nextflow home and work directories
+    mkdir /nxf_home /nxf_work
+    chmod -R 777 /nxf_home /nxf_work
 
     cd /opt; git clone https://github.com/formbio/FLAG.git; cd FLAG; git checkout v2.0.0
-    cd /opt/FLAG; bash makeDirectories.sh; bash direct_pull_singularity_images_and_move_to_folders.sh; bash setup_eggnogDB.sh
+    #cd /opt; singularity pull flag_augustus.image docker://ghcr.io/formbio/flag_augustus_singularity:latest
+    #cd /buildFiles; singularity build flag_augustus.image flag_augustus.def; mv /buildFiles/flag_augustus.image  /opt/FLAG/containers/augustus/flag_augustus.image 
+    cd /opt/FLAG/containers/augustus/; singularity pull flag_augustus.image docker://ghcr.io/formbio/flag_augustus_singularity:latest
+    #cd /opt/FLAG/containers/augustus/; mv /opt/flag_augustus.image .
+    cd /opt/FLAG/containers/cbbasic; singularity pull flag_cbbasic.image docker://ghcr.io/formbio/flag_cbbasic:latest
+    cd /opt/FLAG/containers/combinefilter; cp -r ../../scripts/ .; singularity build --fix-perms flag_combinefilter.image Singularity.def
+    cd /opt/FLAG/containers/entap; singularity pull flag_entap.image docker://ghcr.io/formbio/flag_entap:latest
+    cd /opt/FLAG/containers/exonerate; singularity pull flag_exonerate.image docker://ghcr.io/formbio/flag_exonerate:latest
+    cd /opt/FLAG/containers/helixercpu; singularity pull flag_helixercpu.image docker://ghcr.io/formbio/flag_helixercpu:latest
+    cd /opt/FLAG/containers/liftoff; singularity pull flag_liftoff.image docker://ghcr.io/formbio/flag_liftoff:latest
+    cd /opt/FLAG/containers/ncbiclibraries; singularity pull flag_ncbiclibraries.image docker://ghcr.io/formbio/flag_ncbiclibraries:latest
+    cd /opt/FLAG/containers/pasa/; singularity pull flag_pasa.image docker://ghcr.io/formbio/flag_augustus_singularity:latest
+    #; mv /opt/flag_pasa.image .
+    #cd /opt/FLAG/containers/tetools; singularity pull --fix-perms flag_tetools.image docker://ghcr.io/formbio/flag_tetools:latest
+    cd /opt/FLAG/containers/transdecoder; singularity pull flag_transdecoder.image docker://ghcr.io/formbio/flag_transdecoder:latest
+    cd /opt/FLAG/containers/trinity; singularity pull flag_trinity.image docker://ghcr.io/formbio/flag_trinity:latest
+
+
+
+    cd /opt/FLAG; bash makeDirectories.sh; bash setup_eggnogDB.sh
 
 %environment
-
+    export NXF_HOME=/nxf_home
+    export NXF_WORK=/nxf_work
 %runscript
     # Forward commands to Nextflow
     bash /opt/run_flag_singularity.sh $@

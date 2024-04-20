@@ -169,7 +169,7 @@ nextflow run main.nf -w workdir/ --output outputdir/ \
 --gtffile examples/GCF_009731565.1_Dplex_v4_genomic.gff --masker skip --transcriptIn true \
 --lineage lepidoptera_odb10 --annotationalgo Liftoff,Helixer,helixer_trained_augustus \
 --helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot \
---speciesScientificName Eynnis_tages --fafile examples/monarchGenome.fa --gtffile examples/monarchAnnotation.gff3 \
+--speciesScientificName Eynnis_tages \
 --funcAnnotProgram eggnog --eggnogDB eggnogDB.tar.gz -profile docker
 ```
 
@@ -194,8 +194,7 @@ nextflow run main.nf -w workdir/ --output outputdir/ \
 --gtffile examples/GCF_009731565.1_Dplex_v4_genomic.gff --masker skip --transcriptIn true \
 --lineage lepidoptera_odb10 --annotationalgo Liftoff,Helixer,helixer_trained_augustus \
 --helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small \
---proteinalgo miniprot --speciesScientificName Eynnis_tages --fafile examples/monarchGenome.fa \
---gtffile examples/monarchAnnotation.gff3 --runMode laptop --funcAnnotProgram eggnog \
+--proteinalgo miniprot --speciesScientificName Eynnis_tages --runMode laptop --funcAnnotProgram eggnog \
 --eggnogDB eggnogDB.tar.gz -profile docker_small
 ```
 

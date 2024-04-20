@@ -289,12 +289,12 @@ An example run of FLAG from a singularity image may look like this in your termi
 ```bash
 (base) wtroy@troytestbox2:~/FLAGTests/nonSudo/FLAG/examples$ singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home \
 --bind $(pwd)/nxf_work:/nxf_work --bind $(pwd):/data --bind $(pwd)/tempdir2:/tmp --bind $(pwd)/.nextflow:/opt/FLAG/.nextflow \
---bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag_new.image -g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
+--bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag.image -g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
 -p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 -z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages -o testout2 \
 -u singularity_small -y laptop
 INFO:    Mounting image with FUSE.
 fusermount: option allow_other only allowed if 'user_allow_other' is set in /etc/fuse.conf
-WARNING: squashfuse mount failed, falling back to extraction: encountered error while trying to mount image "/home/wtroy/FLAGTests/April8/nonSudo/FLAG/containers/singularity_flag/test/new/test/singularity_flag_new.image" with FUSE at /tmp/rootfs-871405359/root: exit status 1
+WARNING: squashfuse mount failed, falling back to extraction: encountered error while trying to mount image "/home/wtroy/FLAGTests/nonSudo/FLAG/examples/singularity_flag.image" with FUSE at /tmp/rootfs-871405359/root: exit status 1
 INFO:    Converting SIF file to temporary sandbox...
 WARNING: underlay of /etc/localtime required more than 50 (81) bind mounts
 No reference fafile File for liftoff Provided

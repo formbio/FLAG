@@ -97,7 +97,8 @@ for the initial flag run:
 ```bash 
 bash build_singularity_flag.sh
 ```
-   
+This final singularity image will be about 76GB.
+
 ## Summary
 
 Genome annotation uses computational algorithms to predict the locations

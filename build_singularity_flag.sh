@@ -6,7 +6,7 @@ cd containers/singularity_flag/
 
 #build the singularity image
 echo "Building the singularity_flag singularity image"
-singularity build singularity_flag.image singularity_flag.def
+singularity build --fakeroot --fix-perms singularity_flag.image singularity_flag.def
 
 # cd to examples
 echo "Entering the examples directory"

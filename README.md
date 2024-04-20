@@ -91,13 +91,14 @@ bash pull_docker_images.sh
 
 ### Setup for Singularity:
 The entirety of FLAG with the eggnog database is in a single singularity image that can be built by the
-user. To simplify this building process a script can be run to build it and move
-it to the examples directory in the FLAG repo.
-
+user. To simplify this building process a script can be run to build the flag singularity image and move
+it to the examples directory in the FLAG repo. This will also setup all necessary files and directories 
+for the initial flag run:
 ```bash 
 bash build_singularity_flag.sh
 ```
-   
+This final singularity image will be about 76GB.
+
 ## Summary
 
 Genome annotation uses computational algorithms to predict the locations
@@ -168,7 +169,7 @@ nextflow run main.nf -w workdir/ --output outputdir/ \
 --gtffile examples/GCF_009731565.1_Dplex_v4_genomic.gff --masker skip --transcriptIn true \
 --lineage lepidoptera_odb10 --annotationalgo Liftoff,Helixer,helixer_trained_augustus \
 --helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small --proteinalgo miniprot \
---speciesScientificName Eynnis_tages --fafile examples/monarchGenome.fa --gtffile examples/monarchAnnotation.gff3 \
+--speciesScientificName Eynnis_tages \
 --funcAnnotProgram eggnog --eggnogDB eggnogDB.tar.gz -profile docker
 ```
 
@@ -193,13 +194,27 @@ nextflow run main.nf -w workdir/ --output outputdir/ \
 --gtffile examples/GCF_009731565.1_Dplex_v4_genomic.gff --masker skip --transcriptIn true \
 --lineage lepidoptera_odb10 --annotationalgo Liftoff,Helixer,helixer_trained_augustus \
 --helixerModel invertebrate --externalalgo input_transcript,input_proteins --size small \
---proteinalgo miniprot --speciesScientificName Eynnis_tages --fafile examples/monarchGenome.fa \
---gtffile examples/monarchAnnotation.gff3 --runMode laptop --funcAnnotProgram eggnog \
+--proteinalgo miniprot --speciesScientificName Eynnis_tages --runMode laptop --funcAnnotProgram eggnog \
 --eggnogDB eggnogDB.tar.gz -profile docker_small
 ```
 
 ## Example Singularity Run commands
-Within the repo all example files from the paper for Erynnis tages are provided, except for the genome assembly which can be downloaded from https://ftp.ensembl.org/pub/rapid-release/species/Erynnis_tages/GCA_905147235.1/braker/genome/Erynnis_tages-GCA_905147235.1-softmasked.fa.gz. The Eggnog database is prebuilt inside of the singularity_flag image and the output directory will be make for you. You must however make a temp directory which will store temporary files made during the run which must be unique for every run and not reused as this will break the run if it is not clean each time.
+Within the repo all example files from the paper for Erynnis tages are provided, except for the genome assembly which can be downloaded from https://ftp.ensembl.org/pub/rapid-release/species/Erynnis_tages/GCA_905147235.1/braker/genome/Erynnis_tages-GCA_905147235.1-softmasked.fa.gz. The Eggnog database is prebuilt inside of the singularity_flag image and the output directory will be make for you. 
+
+Before each run you MUST make sure these things are in your local run directory as they will be bound to the singularity image:
+1. You must however make an EMPTY temp directory which will store temporary files made during the run which must be unique for every run and not reused as this will break the run if it is not clean each time.
+2. a file named pipeline.trace must be present
+3. a nxf_work directory
+4. a nxf_home directory which must have the following structure:
+nxf_home/framework/23.10.0/nextflow-23.10.0-one.jar
+This nextflow-23.10.0-one.jar file can be downloaded with `wget https://www.nextflow.io/releases/v23.10.0/nextflow-23.10.0-one.jar`
+5. a .nextflow directory
+
+It should be noted that all of these files/directories and the flag singularity image can be made correctly by running:
+```bash
+bash build_singularity_flag.sh
+```
+
 
 The major thing of note is that the flags for the run parameters change slightly when running from the singularity_flag image as the entrypoint for the image is a script instead of Nextflow. The flags are the same as running with Nextflow except just have different call sign which are below:
 -h Help documentation for run_flag_singularity.sh
@@ -223,24 +238,23 @@ The major thing of note is that the flags for the run parameters change slightly
 ### Local Singularity Run Examples:
 After uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH Singularity where $(pwd)/tempdir is your clean temporary directory for the run:
 ```bash
-singularity run --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp \
---overlay $(pwd)/tempdir  singularity_flag.image \
+singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home --bind $(pwd)/nxf_work:/nxf_work \
+--bind $(pwd):/data --bind $(pwd)/tempdir:/tmp --bind $(pwd)/.nextflow:/opt/FLAG/.nextflow \
+--bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag_new.image \
 -g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
 -p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 \
--z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
--w miniprot -y normal -p singularity -o outputdir -u singularity
+-z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages -o outdir
 ```
 
 If Liftoff is desired the above command can be modified such as below:
 ```bash
-singularity run --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp \
---overlay $(pwd)/tempdir  singularity_flag.image \
--g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
--p curatedButterflyProteins.fa -f GCF_009731565.1_Dplex_v4_genomic.fa \
--a GCF_009731565.1_Dplex_v4_genomic.gff -m skip -t true \
--l lepidoptera_odb10 \
--z Liftoff,Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
--w miniprot -y normal -p singularity -o outputdir -u singularity
+singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home --bind $(pwd)/nxf_work:/nxf_work \
+--bind $(pwd):/data --bind $(pwd)/tempdir:/tmp --bind $(pwd)/.nextflow:/opt/FLAG/.nextflow \
+--bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag_new.image \
+-g Erynnis_tages-GCA_905147235.1-softmasked.fa -f GCF_009731565.1_Dplex_v4_genomic.fa \
+-a GCF_009731565.1_Dplex_v4_genomic.gff -r curatedButterflyRNA.fa \
+-p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 \
+-z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages -o outdir
 ```
 
 ### Local Singularity Run Examples for Small Computers or Laptops:
@@ -248,24 +262,103 @@ This has only been tested on smaller genomes under 1Gb on a 16 vCPU, 8 CPU, mach
 
 After uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH Singularity where $(pwd)/tempdir is your clean temporary directory for the run:
 ```bash
-singularity run --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp \
---overlay $(pwd)/tempdir  singularity_flag.image \
+singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home --bind $(pwd)/nxf_work:/nxf_work \
+--bind $(pwd):/data --bind $(pwd)/tempdir:/tmp --bind $(pwd)/.nextflow:/opt/FLAG/.nextflow \
+--bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag_new.image \
 -g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
 -p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 \
--z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
--w miniprot -y normal -p singularity -o outputdir -y laptop -u singularity_small
+-z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages -o outdir \
+-y laptop -u singularity_small
 ```
 
 If Liftoff is desired the above command can be modified such as below:
 ```bash
-singularity run --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp \
---overlay $(pwd)/tempdir  singularity_flag.image \
--g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
--p curatedButterflyProteins.fa -f GCF_009731565.1_Dplex_v4_genomic.fa \
--a GCF_009731565.1_Dplex_v4_genomic.gff -m skip -t true \
--l lepidoptera_odb10 \
--z Liftoff,Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages \
--w miniprot -y normal -p singularity -o outputdir -y laptop -u singularity_small
+singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home --bind $(pwd)/nxf_work:/nxf_work \
+--bind $(pwd):/data --bind $(pwd)/tempdir:/tmp --bind $(pwd)/.nextflow:/opt/FLAG/.nextflow \
+--bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag_new.image \
+-g Erynnis_tages-GCA_905147235.1-softmasked.fa -f GCF_009731565.1_Dplex_v4_genomic.fa \
+-a GCF_009731565.1_Dplex_v4_genomic.gff -r curatedButterflyRNA.fa \
+-p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 \
+-z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages -o outdir \
+-y laptop -u singularity_small
+```
+
+An example run of FLAG from a singularity image may look like this in your terminal 
+(for the first run it may have additional outputs as well for creating nextflow files):
+```bash
+(base) wtroy@troytestbox2:~/FLAGTests/nonSudo/FLAG/examples$ singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home \
+--bind $(pwd)/nxf_work:/nxf_work --bind $(pwd):/data --bind $(pwd)/tempdir2:/tmp --bind $(pwd)/.nextflow:/opt/FLAG/.nextflow \
+--bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag.image -g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
+-p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 -z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages -o testout2 \
+-u singularity_small -y laptop
+INFO:    Mounting image with FUSE.
+fusermount: option allow_other only allowed if 'user_allow_other' is set in /etc/fuse.conf
+WARNING: squashfuse mount failed, falling back to extraction: encountered error while trying to mount image "/home/wtroy/FLAGTests/nonSudo/FLAG/examples/singularity_flag.image" with FUSE at /tmp/rootfs-871405359/root: exit status 1
+INFO:    Converting SIF file to temporary sandbox...
+WARNING: underlay of /etc/localtime required more than 50 (81) bind mounts
+No reference fafile File for liftoff Provided
+No reference annotation File for liftoff Provided
+proteinalgo was not specified. Defaulting to miniprot
+outputdir is testout2
+Formatting outputdir
+RUNNING
+nextflow run main.nf -w /data/workdir/ --output /data/testout2/ --genome /data/Erynnis_tages-GCA_905147235.1-softmasked.fa --rna /data/curatedButterflyRNA.fa --proteins /data/curatedButterflyProteins.fa   --masker skip --transcriptIn true --lineage lepidoptera_odb10 --annotationalgo Helixer,helixer_trained_augustus --helixerModel vertebrate --externalalgo input_transcript,input_proteins --size small  Eynnis_tages --funcAnnotProgram eggnog --eggnogDB /opt/FLAG/eggnogDB.tar.gz --runMode laptop -profile singularity_small
+N E X T F L O W  ~  version 23.10.0
+Launching `main.nf` [dreamy_maxwell] DSL2 - revision: 6332396f7e
+WARN: Access to undefined parameter `fafile` -- Initialise it to a default value eg. `params.fafile = some_value`
+WARN: Access to undefined parameter `gtffile` -- Initialise it to a default value eg. `params.gtffile = some_value`
+WARN: Access to undefined parameter `blastdb` -- Initialise it to a default value eg. `params.blastdb = some_value`
+WARN: Access to undefined parameter `rnaDB` -- Initialise it to a default value eg. `params.rnaDB = some_value`
+ Test - N F   P I P E L I N E
+ ===================================
+ outdir               : /data/testout2/
+ masker               : skip
+ genome               : /data/Erynnis_tages-GCA_905147235.1-softmasked.fa
+ proteins             : /data/curatedButterflyProteins.fa
+ rna                  : /data/curatedButterflyRNA.fa
+ reference_genome     : null
+ reference_annotation : null
+ protein database     : null
+ rna database         : null
+ transcriptIn         : true
+ Busco Lineage        : lepidoptera_odb10
+ entapDB              : entapDBs.tar.gz
+ Augustus Pretrained Species   : human
+ Helixer Model                 : vertebrate
+ Helixer Models Available      : verterbrate, invertebrate, land_plant, fungi
+ Genome Size                   : small
+ Species Scientific Name       : Replace_name
+ 
+ all annotation algos options  : Helixer, Liftoff, denovo_augustus, related_species_augustus, augustus_pretrained, liftoff_trained_augustus, helixer_trained_augustus, transdecoder
+ chosen annotation algos       : Helixer,helixer_trained_augustus
+ 
+ all external algos options    : input_transcript, input_proteins, transcript_from_database, proteins_from_database
+ chosen external algos         : input_transcript,input_proteins
+ 
+ all protein algos             : exonerate, genomethreader, prosplign, miniprot
+ chosen protein algos          : miniprot
+
+executor >  Local (11)
+[bb/bf1d0b] process > trnascan (1)                 [100%] 1 of 1 ✔
+[e3/220acb] process > protein_removedupsfa (1)     [100%] 1 of 1 ✔
+[28/7293d7] process > miniprot (1)                 [100%] 1 of 1 ✔
+[d5/aecbf8] process > rna_removedupsfa (1)         [100%] 1 of 1 ✔
+[1a/389b2f] process > pasa (1)                     [100%] 1 of 1 ✔
+[ae/0a4b4c] process > splign (1)                   [100%] 1 of 1 ✔
+[de/310f32] process > Helixer (1)                  [100%] 1 of 1 ✔
+[aa/5b63a3] process > helixer_trained_augustus (1) [100%] 1 of 1 ✔
+[fe/f861e8] process > CombineAndFilter (1)         [100%] 1 of 1 ✔
+[14/505a92] process > functionalAnnotation (1)     [100%] 1 of 1 ✔
+[4c/be8a3d] process > combinestructwfunct (1)      [100%] 1 of 1 ✔
+WARN: Failed to render execution report -- see the log file for details
+WARN: Failed to render execution timeline -- see the log file for details
+Completed at: 19-Apr-2024 23:59:53
+Duration    : 9h 1m 33s
+CPU hours   : 142.8
+Succeeded   : 11
+
+
+INFO:    Cleaning up image...
 ```
 
 ## Extra Info on Parameters:

@@ -18,7 +18,7 @@ mv ../containers/singularity_flag/singularity_flag.image .
 
 # Setup the run directory
 echo "Creating initial files/directories needed to run flag from the singularity image"
-mkdir nxf_temp
+mkdir nxf_work
 mkdir nxf_home; cd nxf_home; mkdir framework; cd framework; mkdir 23.10.0; cd 23.10.0
 wget https://www.nextflow.io/releases/v23.10.0/nextflow-23.10.0-one.jar
 cd ../../../

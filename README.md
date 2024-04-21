@@ -240,7 +240,7 @@ After uncompressing the example run files in the example folder one can annotate
 ```bash
 singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home --bind $(pwd)/nxf_work:/nxf_work \
 --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp --bind $(pwd)/.nextflow:/opt/FLAG/.nextflow \
---bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag_new.image \
+--bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag.image \
 -g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
 -p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 \
 -z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages -o outdir
@@ -250,7 +250,7 @@ If Liftoff is desired the above command can be modified such as below:
 ```bash
 singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home --bind $(pwd)/nxf_work:/nxf_work \
 --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp --bind $(pwd)/.nextflow:/opt/FLAG/.nextflow \
---bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag_new.image \
+--bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag.image \
 -g Erynnis_tages-GCA_905147235.1-softmasked.fa -f GCF_009731565.1_Dplex_v4_genomic.fa \
 -a GCF_009731565.1_Dplex_v4_genomic.gff -r curatedButterflyRNA.fa \
 -p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 \
@@ -264,7 +264,7 @@ After uncompressing the example run files in the example folder one can annotate
 ```bash
 singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home --bind $(pwd)/nxf_work:/nxf_work \
 --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp --bind $(pwd)/.nextflow:/opt/FLAG/.nextflow \
---bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag_new.image \
+--bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag.image \
 -g Erynnis_tages-GCA_905147235.1-softmasked.fa -r curatedButterflyRNA.fa \
 -p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 \
 -z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages -o outdir \
@@ -275,7 +275,7 @@ If Liftoff is desired the above command can be modified such as below:
 ```bash
 singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home --bind $(pwd)/nxf_work:/nxf_work \
 --bind $(pwd):/data --bind $(pwd)/tempdir:/tmp --bind $(pwd)/.nextflow:/opt/FLAG/.nextflow \
---bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag_new.image \
+--bind $(pwd)/pipeline_trace.txt:/opt/FLAG/pipeline_trace.txt singularity_flag.image \
 -g Erynnis_tages-GCA_905147235.1-softmasked.fa -f GCF_009731565.1_Dplex_v4_genomic.fa \
 -a GCF_009731565.1_Dplex_v4_genomic.gff -r curatedButterflyRNA.fa \
 -p curatedButterflyProteins.fa -m skip -t true -l lepidoptera_odb10 \

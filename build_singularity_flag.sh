@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Create a custom temporary directory
+mkdir -p $(pwd)/singularity_tmp
+
+# Set Singularity temporary directory and cache directory
+export SINGULARITY_TMPDIR=$(pwd)/singularity_tmp
+export SINGULARITY_CACHEDIR=$(pwd)/singularity_tmp/cache
+
 # cd to the directory
 echo "Entering singularity_flag container directory"
 cd containers/singularity_flag/

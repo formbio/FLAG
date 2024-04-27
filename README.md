@@ -93,8 +93,9 @@ bash pull_docker_images.sh
 1. Pull the singularity images: bash direct_pull_singularity.sh 
 2. Make the eggnog database:
  <p>bash setup_eggnogDB.sh</p>
-3. Make sure your output directory exists and can be written to. If running the example run command you can run the makeDirectories.sh script to do this. 
-4. Make sure you have a tmp directory that can be written to. This directory MUST be unique for each run or clean and must be exported
+3. Make sure your output directory exists and can be written to. If running the example run command you can run the makeDirectories.sh script to do this.
+
+4. Make sure you have a tmp directory that can be written to. This directory MUST be unique for each run or clean and must be exported.
 
 #### Summary of Singularity Setup Commands:
 ```bash

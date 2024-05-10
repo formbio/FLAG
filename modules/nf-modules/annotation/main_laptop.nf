@@ -290,6 +290,7 @@ process Helixer {
     path("Helixer.gff3"), emit: gff3
   script:
   """
+  export HOME=/root
   bash ${params.repoDir}/scripts/geneannotation/helixer.sh -i ${genome} -n ${name} -m ${model} -s ${size}
   """
   stub:

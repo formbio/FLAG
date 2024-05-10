@@ -18,10 +18,6 @@ echo "pulling flag_exonerate"
 singularity pull flag_exonerate.image docker://ghcr.io/formbio/flag_exonerate:latest
 mv flag_exonerate.image containers/exonerate/
 
-# echo "pulling flag_helixer"
-# singularity pull flag_helixer.image docker://ghcr.io/formbio/flag_helixer:latest
-# mv flag_helixer.image containers/helixer/
-
 echo "pulling flag_helixercpu"
 singularity pull flag_helixercpu.image docker://ghcr.io/formbio/flag_helixercpu:latest
 mv flag_helixercpu.image containers/helixercpu/
@@ -34,14 +30,8 @@ echo "pulling flag_ncbiclibraries"
 singularity pull flag_ncbiclibraries.image docker://ghcr.io/formbio/flag_ncbiclibraries:latest
 mv flag_ncbiclibraries.image containers/ncbiclibraries/
 
-# echo "pulling flag_cbbasic"
-# singularity pull flag_ncbitools.image docker://ghcr.io/formbio/flag_ncbitools:latest
-# mv flag_ncbitools.image containers/ncbitools/
-
 echo "pulling flag_pasa"
 cp containers/augustus/flag_augustus.image containers/pasa/flag_pasa.image
-# singularity pull flag_pasa.image docker://ghcr.io/formbio/flag_pasa:latest
-# mv flag_pasa.image containers/pasa/
 
 echo "pulling flag_tetools"
 singularity pull flag_tetools.image docker://ghcr.io/formbio/flag_tetools:latest

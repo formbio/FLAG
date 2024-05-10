@@ -94,18 +94,21 @@ bash pull_docker_images.sh
 ### Setup for Singularity with Nextflow:
 1. Step 1 is not always required but usually recommended as default singularity installs may be old or problematic depending on your singularity system settings. For this we recommend installing the latest version of apptainer with conda as this has been shown to work for various people.
 
-First we create the conda env with the name 'flag', as of writing apptainer v1.3 is the latest.
+<p>First we create the conda env with the name 'flag', as of writing apptainer v1.3 is the latest.</p>
+
  ```bash
 conda create -n flag apptainer
 ```
 
-After this activate the environment and copy the apptainer config file to conda's location like so:
+<p>After this activate the environment and copy the apptainer config file to conda's location like so:</p>
+
 ```bash
 conda activate flag
 cp /etc/apptainer/apptainer.config $CONDA_PREFIX/etc/apptainer/
 ```
 
-All steps after 1 ARE required. 
+<p>All steps after 1 ARE required.</p> 
+
 2. Pull the singularity images: bash direct_pull_singularity.sh 
 3. Make the eggnog database:
  <p>bash setup_eggnogDB.sh</p>
@@ -139,18 +142,21 @@ export SINGULARITY_TMPDIR="$(pwd)/tmp"
 The entirety of FLAG with the eggnog database is in a single singularity image that can be built by the user. To simplify this building process a script can be run to build the flag singularity image and move it to the examples directory in the FLAG repo. This will also setup all necessary files and directories for the initial flag run:
 1. Step 1 is not always required but usually recommended as default singularity installs may be old or problematic depending on your singularity system settings. For this we recommend installing the latest version of apptainer with conda as this has been shown to work for various people.
 
-First we create the conda env with the name 'flag', as of writing apptainer v1.3 is the latest.
+<p>First we create the conda env with the name 'flag', as of writing apptainer v1.3 is the latest.</p>
+
  ```bash
 conda create -n flag apptainer
 ```
 
-After this activate the environment and copy the apptainer config file to conda's location like so:
+<p>After this activate the environment and copy the apptainer config file to conda's location like so:</p>
+
 ```bash
 conda activate flag
 cp /etc/apptainer/apptainer.config $CONDA_PREFIX/etc/apptainer/
 ```
 
-All steps after 1 ARE required. 
+<p>All steps after 1 ARE required. </p>
+
 2. Build the large singularity image (This image will be about 76GB):
 ```bash 
 bash build_singularity_flag.sh

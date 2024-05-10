@@ -161,6 +161,9 @@ cp /etc/apptainer/apptainer.config $CONDA_PREFIX/etc/apptainer/
 ```bash 
 bash build_singularity_flag.sh
 ```
+<p>Note: If you have a conda env for apptainer you may need to run the steps from the script yourself instead</p>
+ <p>of from the script so the singularity image is built correctly for your singularity version. The current script</p>
+ <p>assumes you have apptainer in a conda env called flag.</p>
 
 ## Summary
 

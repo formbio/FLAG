@@ -10,12 +10,12 @@ This is the public repository for FLAG, the Form Bio Genome Annotation Workflow.
 - [Setup:](#setup)
   * [Setup for Docker](#setup-for-docker)
   * [Setup for Singularity with Nextflow](#setup-for-singularity-with-nextflow)
-  * [ Setup for Singularity from Single Singularity Image (Experimental)](#setup-for-singularity-from-single-singularity-image-(experimental))
+  * [Setup for Singularity from Single Singularity Image - Experimental](#setup-for-singularity-from-single-singularity-image---experimental)
 - [Summary](#summary)
 - [Run Parameteres:](#run-parameteres)
 - [Example Docker Run commands](#example-docker-run-commands)
 - [Example Singularity with Nextflow Run commands](#example-singularity-with-nextflow-run-commands)
-- [Example Singularity from Single Singularity Image (Experimental) Run commands](#example-singularity-from-single-singularity-image-(experimental)-run-commands)
+- [Example Singularity from Single Singularity Image - Experimental - Run commands](#example-singularity-from-single-singularity-image---experimental---run-commands)
 - [Extra Info on Parameters:](#extra-info-on-parameters)
   * [genome](#genome)
   * [masker](#masker)
@@ -135,7 +135,7 @@ Export your temp directory
 export SINGULARITY_TMPDIR="$(pwd)/tmp"
 ```
 
-### Setup for Singularity from Single Singularity Image (Experimental):
+### Setup for Singularity from Single Singularity Image - Experimental:
 The entirety of FLAG with the eggnog database is in a single singularity image that can be built by the user. To simplify this building process a script can be run to build the flag singularity image and move it to the examples directory in the FLAG repo. This will also setup all necessary files and directories for the initial flag run:
 1. Step 1 is not always required but usually recommended as default singularity installs may be old or problematic depending on your singularity system settings. For this we recommend installing the latest version of apptainer with conda as this has been shown to work for various people.
 
@@ -312,7 +312,7 @@ nextflow run main.nf -w workdir/ --output outputdir/ \
 --eggnogDB eggnogDB.tar.gz -profile singularity_small
 ```
 
-## Example Singularity from Single Singularity Image (Experimental) Run commands
+## Example Singularity from Single Singularity Image - Experimental - Run commands
 Within the repo all example files from the paper for Erynnis tages are provided, except for the genome assembly which can be downloaded from https://ftp.ensembl.org/pub/rapid-release/species/Erynnis_tages/GCA_905147235.1/braker/genome/Erynnis_tages-GCA_905147235.1-softmasked.fa.gz. The Eggnog database is prebuilt inside of the singularity_flag image and the output directory will be make for you. 
 
 Before each run you MUST make sure these things are in your local run directory as they will be bound to the singularity image:
@@ -349,7 +349,7 @@ The major thing of note is that the flags for the run parameters change slightly
 -u  (profile)
 -o  (output folder name)
 
-### Local Singularity from Single Singularity Image (Experimental) Run Examples:
+### Local Singularity from Single Singularity Image - Experimental - Run Examples:
 After uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH Singularity where $(pwd)/tempdir is your clean temporary directory for the run:
 ```bash
 singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home --bind $(pwd)/nxf_work:/nxf_work \
@@ -371,7 +371,7 @@ singularity run --fakeroot --bind $(pwd)/nxf_home:/nxf_home --bind $(pwd)/nxf_wo
 -z Helixer,helixer_trained_augustus -q vertebrate -s small -n Eynnis_tages -o outdir
 ```
 
-### Local Singularity from Single Singularity Image (Experimental) Run Examples for Small Computers or Laptops:
+### Local Singularity from Single Singularity Image - Experimental - Run Examples for Small Computers or Laptops:
 This has only been tested on smaller genomes under 1Gb on a 16 vCPU, 8 CPU, machine with 32Gb of RAM. It may work for larger genomes but that has not been tested. Note that you are free to change the modules and scripts to your specific compute requirements if you have more or less CPUs and RAM.
 
 After uncompressing the example run files in the example folder one can annotate Eynnis tages with the following run command without Liftoff and WITH Singularity where $(pwd)/tempdir is your clean temporary directory for the run:

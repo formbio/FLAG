@@ -321,6 +321,10 @@ nextflow run main.nf -w workdir/ --output outputdir/ \
 --eggnogDB eggnogDB.tar.gz -profile singularity_small
 ```
 
+An example of what a run should look like using the configuration of singularity with nextflow:
+![Screenshot 2024-05-12 at 6 45 13 PM](https://github.com/formbio/FLAG/assets/31960415/bed007f0-dd60-4847-910c-1bfe174c0e81)
+
+
 ## Example Singularity from Single Singularity Image - Experimental - Run commands
 Within the repo all example files from the paper for Erynnis tages are provided, except for the genome assembly which can be downloaded from https://ftp.ensembl.org/pub/rapid-release/species/Erynnis_tages/GCA_905147235.1/braker/genome/Erynnis_tages-GCA_905147235.1-softmasked.fa.gz. The Eggnog database is prebuilt inside of the singularity_flag image and the output directory will be make for you. 
 

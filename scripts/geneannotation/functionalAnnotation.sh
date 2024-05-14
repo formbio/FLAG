@@ -38,8 +38,8 @@ if [[ -s ${databases} ]]
 then
     mkdir -p db
     tar xvfz ${databases} --strip-components=1 -C db
-    mkdir /dbs
-    mv db/* /dbs
+    # mkdir /dbs
+    # mv db/* /dbs
 else
     echo "Missing Database File"
     usage
@@ -68,15 +68,12 @@ agat_sp_extract_sequences.pl --clean_final_stop --gff $annotation -f genome.fa -
 
 if [ "${program}" == "entap" ]; then
 
-    EnTAP --runP -i protein.fa -d /dbs/uniprot_sprot.dmnd --ini /opt/EnTAP/entap_config.ini --threads $threads
+    EnTAP --runP -i protein.fa -d db/uniprot_sprot.dmnd --ini /opt/EnTAP/entap_config.ini --threads $threads
 
     mv entap_outfiles/final_results/* .
 else
-    export EGGNOG_DATA_DIR=/dbs/
+    export EGGNOG_DATA_DIR=db/
 
     emapper.py -i protein.fa -o eggnog --evalue 0.05 --cpu ${threads}
     cp eggnog.emapper.annotations eggnog_results.tsv
 fi
-
-#rm genome.fa
-
